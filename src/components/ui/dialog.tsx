@@ -76,7 +76,7 @@ export function DialogCloseButton({ className }: { className?: string }) {
   return (
     <DialogPrimitive.Close
       className={cn(
-        "absolute top-3 right-3 rounded-sm p-2 text-muted-foreground hover:text-foreground",
+        "absolute top-2 right-2 flex size-11 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
         className,
       )}
       aria-label="닫기"

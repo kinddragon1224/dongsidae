@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { ERA_SHORTCUTS, ZOOM_LEVELS } from "@/lib/history/constants";
+import { ERA_SHORTCUTS } from "@/lib/history/constants";
 import { yearHeadline } from "@/lib/history/query";
 import { getRegionSnapshot } from "@/lib/history/snapshot";
 import { REGION_META } from "@/lib/history/regions";
@@ -12,29 +12,26 @@ import { visualForYear } from "@/lib/visuals/registry";
 import { cn } from "@/lib/utils";
 import { EventCard } from "./event-card";
 
+/** Sparse decades still show the nearest sourced event in each column. */
+const MOBILE_NEARBY = 80;
+
 export function MobileNow() {
   const year = useTimeline((s) => s.year);
   const selectedId = useTimeline((s) => s.selectedId);
   const select = useTimeline((s) => s.select);
-  const regions = useTimeline((s) => s.regions);
-  const toggleRegion = useTimeline((s) => s.toggleRegion);
   const shift = useTimeline((s) => s.shift);
-  const zoomId = useTimeline((s) => s.zoomId);
-  const setZoom = useTimeline((s) => s.setZoom);
   const setYearInputOpen = useTimeline((s) => s.setYearInputOpen);
   const zoom = useZoom();
   const swipe = useSwipeYear(
     () => shift(-zoom.step),
     () => shift(zoom.step),
   );
-  const sectionRefs = useRef<Partial<Record<Region, HTMLElement | null>>>({});
   const headline = yearHeadline(year);
-  const visible = REGIONS.filter((id) => regions[id]);
   const wash = visualForYear(year);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="shrink-0 border-b border-border px-3 pt-3 pb-3">
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden">
+      <div className="shrink-0 border-b border-border px-4 pt-2.5 pb-3">
         <button
           type="button"
           onClick={() => {
@@ -45,7 +42,7 @@ export function MobileNow() {
           onPointerMove={swipe.onPointerMove}
           onPointerUp={swipe.onPointerUp}
           onPointerCancel={swipe.onPointerUp}
-          className="relative flex min-h-[4.5rem] w-full touch-manipulation flex-col items-center justify-center overflow-hidden px-1 text-center"
+          className="relative flex w-full min-w-0 min-h-14 touch-manipulation flex-col items-start justify-center overflow-hidden text-left"
           aria-label="연도 입력. 좌우로 밀면 연도가 바뀝니다."
         >
           {wash ? (
@@ -57,163 +54,43 @@ export function MobileNow() {
               />
             </span>
           ) : null}
+          <span className="relative text-xs tracking-[0.22em] text-subtle">지금</span>
           <span
             key={year}
-            className="year-swap relative block font-serif text-5xl leading-none font-medium tracking-tight text-primary tabular-nums"
+            className="year-swap relative mt-1 block max-w-full font-serif text-4xl leading-none font-medium tracking-tight text-primary tabular-nums"
           >
             {formatYearBare(year)}
           </span>
-          <span className="relative mt-2 block truncate text-sm text-muted-foreground">
+          <span className="relative mt-1.5 block w-full truncate text-sm text-muted-foreground">
             {headline}
           </span>
         </button>
 
-        <div className="mt-4 grid grid-cols-2 gap-1.5">
-          {visible.map((id) => {
-            const row = getRegionSnapshot(id, year, { nearbyRange: 12, nearbyLimit: 1 });
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => {
-                  sectionRefs.current[id]?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }}
-                className="flex min-h-14 items-start gap-2 rounded-lg border border-border bg-card px-2.5 py-2 text-left active:bg-accent"
-              >
-                <span
-                  className="mt-1.5 size-1.5 shrink-0 rounded-full"
-                  style={{ background: REGION_META[id].token }}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[0.625rem] tracking-wide text-subtle">
-                    {REGION_META[id].short}
-                    {row.headline.label ? ` · ${row.headline.label}` : ""}
-                  </span>
-                  <span className="mt-0.5 block truncate text-sm text-foreground">
-                    {row.headline.title}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-3 flex gap-1 overflow-x-auto pb-0.5">
+        <ul className="mt-3 grid w-full grid-cols-2 gap-2">
           {REGIONS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => toggleRegion(id)}
-              className={cn(
-                "h-11 shrink-0 rounded-full px-3 text-sm",
-                regions[id]
-                  ? "bg-secondary text-foreground"
-                  : "text-subtle line-through",
-              )}
-            >
-              {REGION_META[id].short}
-            </button>
+            <li key={id} className="min-w-0">
+              <SnapshotTile
+                region={id}
+                year={year}
+                onOpen={(eventId) => select(eventId)}
+              />
+            </li>
           ))}
-        </div>
-
-        <div className="mt-2 flex gap-1 overflow-x-auto pb-0.5">
-          {ZOOM_LEVELS.map((level) => (
-            <button
-              key={level.id}
-              type="button"
-              onClick={() => setZoom(level.id)}
-              className={cn(
-                "h-11 shrink-0 rounded-full px-4 text-sm",
-                zoomId === level.id
-                  ? "bg-secondary text-foreground"
-                  : "text-muted-foreground",
-              )}
-            >
-              {level.label}
-            </button>
-          ))}
-        </div>
+        </ul>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pt-4 pb-5">
-        {visible.map((id) => {
-          const snap = getRegionSnapshot(id, year, { nearbyRange: 16, nearbyLimit: 4 });
-          const meta = REGION_META[id];
-          const activeEvents = snap.active.filter(
-            (item, index, arr) =>
-              arr.findIndex((row) => row.event.id === item.event.id) === index,
-          );
-          return (
-            <section
-              key={id}
-              ref={(el) => {
-                sectionRefs.current[id] = el;
-              }}
-              className="mb-7 scroll-mt-3"
-            >
-              <div className="mb-2.5 flex items-baseline gap-2 px-0.5">
-                <span
-                  className="size-1.5 shrink-0 rounded-full"
-                  style={{ background: meta.token }}
-                />
-                <h2 className="font-serif text-base text-foreground">{meta.label}</h2>
-              </div>
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-3 pb-4">
+        {REGIONS.map((id) => (
+          <RegionNowList
+            key={id}
+            region={id}
+            year={year}
+            selectedId={selectedId}
+            onSelect={select}
+          />
+        ))}
 
-              {activeEvents.length > 0 && (
-                <div className="mb-3">
-                  <p className="mb-1.5 px-0.5 text-[0.625rem] tracking-wide text-subtle">
-                    지금
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {activeEvents.map((item) => (
-                      <EventCard
-                        key={item.event.id}
-                        event={item.event}
-                        active={item.event.id === selectedId}
-                        onSelect={select}
-                        currentYear={year}
-                        label={item.label}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {(snap.nearbyBefore.length > 0 || snap.nearbyAfter.length > 0) && (
-                <div>
-                  <p className="mb-1.5 px-0.5 text-[0.625rem] tracking-wide text-subtle">
-                    전후
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {[...snap.nearbyBefore, ...snap.nearbyAfter]
-                      .sort((a, b) => a.years - b.years)
-                      .map((item) => (
-                        <EventCard
-                          key={item.event.id}
-                          event={item.event}
-                          active={item.event.id === selectedId}
-                          onSelect={select}
-                          currentYear={year}
-                          label={item.label}
-                        />
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {activeEvents.length === 0 &&
-                snap.nearbyBefore.length === 0 &&
-                snap.nearbyAfter.length === 0 && (
-                  <p className="px-0.5 text-sm text-subtle">가까운 기록이 드뭅니다.</p>
-                )}
-            </section>
-          );
-        })}
-
-        <div className="flex gap-1.5 overflow-x-auto pb-2">
+        <div className="mt-1 flex min-w-0 gap-1.5 overflow-x-auto pb-1">
           {ERA_SHORTCUTS.map((era) => (
             <button
               key={era.id}
@@ -233,6 +110,121 @@ export function MobileNow() {
       </div>
     </div>
   );
+}
+
+function SnapshotTile({
+  region,
+  year,
+  onOpen,
+}: {
+  region: Region;
+  year: number;
+  onOpen: (id: string) => void;
+}) {
+  const row = getRegionSnapshot(region, year, {
+    nearbyRange: MOBILE_NEARBY,
+    nearbyLimit: 1,
+  });
+  const meta = REGION_META[region];
+  const eventId = row.headline.event?.id;
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (eventId) onOpen(eventId);
+      }}
+      disabled={!eventId}
+      className="flex min-h-14 w-full min-w-0 touch-manipulation items-start gap-2 overflow-hidden rounded-lg border border-border bg-card px-2.5 py-2 text-left active:bg-accent disabled:active:bg-card"
+    >
+      <span
+        className="mt-1.5 size-1.5 shrink-0 rounded-full"
+        style={{ background: meta.token }}
+      />
+      <span className="min-w-0 flex-1 overflow-hidden">
+        <span className="block truncate text-xs tracking-wide text-subtle">
+          {meta.short}
+          {row.headline.label ? ` · ${row.headline.label}` : ""}
+        </span>
+        <span className="mt-0.5 block truncate text-sm text-foreground">
+          {row.headline.title}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function RegionNowList({
+  region,
+  year,
+  selectedId,
+  onSelect,
+}: {
+  region: Region;
+  year: number;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  const snap = getRegionSnapshot(region, year, {
+    nearbyRange: MOBILE_NEARBY,
+    nearbyLimit: 2,
+  });
+  const meta = REGION_META[region];
+  const nowEvents = uniqueActive(snap.active).slice(0, 2);
+  const nearby = [...snap.nearbyBefore, ...snap.nearbyAfter]
+    .sort((a, b) => a.years - b.years)
+    .filter((item) => !nowEvents.some((row) => row.event.id === item.event.id))
+    .slice(0, 2);
+
+  if (nowEvents.length === 0 && nearby.length === 0) return null;
+
+  return (
+    <section className="mb-5 min-w-0">
+      <div className="mb-2 flex min-w-0 items-baseline gap-2">
+        <span
+          className="size-1.5 shrink-0 rounded-full"
+          style={{ background: meta.token }}
+        />
+        <h2 className="min-w-0 truncate font-serif text-sm text-foreground">
+          {meta.label}
+        </h2>
+      </div>
+      <div className="flex min-w-0 flex-col gap-2">
+        {nowEvents.map((item) => (
+          <EventCard
+            key={item.event.id}
+            event={item.event}
+            active={item.event.id === selectedId}
+            compact
+            onSelect={onSelect}
+            currentYear={year}
+            label={item.label}
+          />
+        ))}
+        {nearby.map((item) => (
+          <EventCard
+            key={item.event.id}
+            event={item.event}
+            active={item.event.id === selectedId}
+            compact
+            onSelect={onSelect}
+            currentYear={year}
+            label={item.label}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function uniqueActive<T extends { event: { id: string; kind: string } }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (item.event.kind === "era") return false;
+    if (seen.has(item.event.id)) return false;
+    seen.add(item.event.id);
+    return true;
+  });
 }
 
 function useSwipeYear(onBack: () => void, onForward: () => void) {

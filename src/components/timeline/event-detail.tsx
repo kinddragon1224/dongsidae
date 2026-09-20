@@ -60,7 +60,7 @@ function DetailBody({ eventId }: { eventId: string }) {
     <DialogContent
       overlayClassName="bg-background/50 md:right-[28rem] md:bg-background/25 xl:right-[32rem]"
       className={cn(
-        "inset-x-0 bottom-0 flex max-h-[88vh] w-full flex-col rounded-t-xl border-t p-0",
+        "inset-x-0 bottom-0 flex max-h-[88vh] w-full min-w-0 flex-col overflow-x-hidden rounded-t-xl border-t p-0",
         "md:inset-y-0 md:right-0 md:left-auto md:w-[28rem] md:rounded-none md:border-t-0 md:border-l",
         "xl:w-[32rem]",
       )}
@@ -209,20 +209,31 @@ function DetailBody({ eventId }: { eventId: string }) {
             />
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Button variant="outline" size="sm" onClick={() => jumpThroughTime(beforeYear)}>
-              <ArrowLeft className="size-3.5" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-11 min-w-0 px-2"
+              onClick={() => jumpThroughTime(beforeYear)}
+            >
+              <ArrowLeft className="hidden size-3.5 md:block" />
               50년 전
             </Button>
             <Button
               variant="secondary"
               size="sm"
+              className="h-11 min-w-0 px-2"
               onClick={() => jumpThroughTime(current.startYear)}
             >
               이 사건
             </Button>
-            <Button variant="outline" size="sm" onClick={() => jumpThroughTime(afterYear)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-11 min-w-0 px-2"
+              onClick={() => jumpThroughTime(afterYear)}
+            >
               50년 후
-              <ArrowRight className="size-3.5" />
+              <ArrowRight className="hidden size-3.5 md:block" />
             </Button>
           </div>
         </section>
@@ -238,11 +249,11 @@ function DetailBody({ eventId }: { eventId: string }) {
                     onClick={() => {
                       jumpThroughTime(other.startYear, () => select(other.id));
                     }}
-                    className="flex min-h-11 w-full items-start gap-2 rounded-md px-2 py-2 text-left hover:bg-accent"
+                    className="flex min-h-11 w-full min-w-0 items-start gap-2 overflow-hidden rounded-md px-2 py-2 text-left hover:bg-accent"
                   >
                     <Link2 className="mt-0.5 size-3.5 shrink-0 text-subtle" />
-                    <span>
-                      <span className="block text-sm text-foreground">
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm text-foreground">
                         {other.title}
                       </span>
                       <span className="block font-serif text-xs text-muted-foreground">
@@ -340,7 +351,7 @@ function CompareColumn({
       type="button"
       onClick={onJump}
       className={cn(
-        "triptych-panel relative overflow-hidden bg-popover px-2 py-3 text-left hover:bg-accent",
+        "triptych-panel relative min-w-0 overflow-hidden bg-popover px-2 py-3 text-left hover:bg-accent",
         current && "is-current bg-secondary",
       )}
     >

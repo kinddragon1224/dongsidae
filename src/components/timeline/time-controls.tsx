@@ -28,7 +28,7 @@ export function TimeControls() {
   }
 
   return (
-    <div className="border-t border-border bg-background px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:px-6">
+    <div className="min-w-0 overflow-x-hidden border-t border-border bg-background px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:px-6 md:pt-2 md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <div className="mx-auto flex max-w-6xl flex-col gap-2">
         <div className="flex items-center gap-2 md:hidden">
           <StepButton step={-zoom.step} onClick={() => shift(-zoom.step)} />

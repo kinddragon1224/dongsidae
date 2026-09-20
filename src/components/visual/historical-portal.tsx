@@ -45,7 +45,7 @@ export function HistoricalPortal({ portal, onOpen }: Props) {
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={cn(
-        "portal-card group relative flex min-h-40 w-full flex-col overflow-hidden rounded-xl text-left",
+        "portal-card group relative flex min-h-36 w-full min-w-0 flex-col overflow-hidden rounded-xl text-left",
         "border border-border bg-card shadow-[var(--shadow-border)]",
         "transition-[box-shadow,transform] duration-200 ease-out",
         "hover:shadow-[var(--shadow-border-hover)] active:scale-[0.98] md:min-h-48",
@@ -72,7 +72,7 @@ export function HistoricalPortal({ portal, onOpen }: Props) {
         <span className="text-[0.625rem] tracking-[0.22em] text-primary/80">
           {portal.archiveLabel}
         </span>
-        <span className="mt-1 font-serif text-4xl tabular-nums tracking-tight text-primary md:text-5xl">
+        <span className="mt-1 font-serif text-3xl tabular-nums tracking-tight text-primary md:text-5xl">
           {formatYearBare(portal.year)}
         </span>
         <span className="mt-2 font-serif text-sm text-foreground">{portal.title}</span>

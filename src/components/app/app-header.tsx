@@ -18,11 +18,11 @@ export function AppHeader() {
   const ai = useAiAvailable();
 
   return (
-    <header className="flex items-center gap-2 border-b border-border px-3 py-2 md:gap-3 md:px-6 md:py-3">
+    <header className="flex min-w-0 items-center gap-2 overflow-x-hidden border-b border-border px-3 py-1.5 md:gap-3 md:px-6 md:py-3">
       <button
         type="button"
         onClick={exitToIntro}
-        className="h-11 px-1 font-serif text-base tracking-wide text-foreground"
+        className="h-11 shrink-0 px-1 font-serif text-base tracking-wide text-foreground"
       >
         동시대
       </button>

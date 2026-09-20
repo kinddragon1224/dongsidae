@@ -32,16 +32,16 @@ export function EventCard({
       type="button"
       onClick={() => onSelect?.(event.id)}
       className={cn(
-        "w-full min-h-16 overflow-hidden rounded-lg border bg-card px-3.5 py-3.5 text-left shadow-[var(--shadow-border)]",
+        "w-full min-w-0 min-h-12 overflow-hidden rounded-lg border bg-card px-3 py-3 text-left shadow-[var(--shadow-border)]",
         "transition-[box-shadow,background-color,transform] duration-150 ease-out",
         "hover:shadow-[var(--shadow-border-hover)] active:scale-[0.96]",
         active ? "border-primary/40" : "border-border",
-        compact && "min-h-12 py-2.5",
+        compact && "min-h-11 py-2.5",
       )}
       style={{ borderLeftWidth: 2, borderLeftColor: region.token }}
     >
       {visual ? (
-        <span aria-hidden className="mb-2 block h-12 overflow-hidden rounded-sm">
+        <span aria-hidden className="mb-2 block h-8 overflow-hidden rounded-sm">
           <img
             src={visual.src}
             alt=""
@@ -49,8 +49,8 @@ export function EventCard({
           />
         </span>
       ) : null}
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="font-serif text-sm leading-snug text-foreground">
+      <div className="flex min-w-0 items-baseline justify-between gap-3">
+        <p className="min-w-0 truncate font-serif text-sm leading-snug text-foreground">
           {event.title}
         </p>
         <p className="shrink-0 font-serif text-xs tabular-nums text-muted-foreground">
@@ -67,13 +67,13 @@ export function EventCard({
           {event.summary}
         </p>
       )}
-      {relative && (
+      {relative && !compact && (
         <p className="mt-1.5 font-serif text-xs tabular-nums text-muted-foreground">
           {event.approximate ? "약 " : ""}
           {formatYearRange(event.startYear, event.endYear)}
         </p>
       )}
-      {event.needsVerification && (
+      {event.needsVerification && !compact && (
         <p className="mt-1.5 text-xs tracking-wide text-subtle">출처 확인 필요</p>
       )}
     </button>

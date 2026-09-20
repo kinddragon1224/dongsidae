@@ -15,7 +15,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "han",
-    title: "한",
+    title: "한나라",
     startYear: -206,
     endYear: 220,
     kind: "era",
@@ -99,7 +99,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "sui",
-    title: "수",
+    title: "수나라",
     startYear: 581,
     endYear: 618,
     kind: "era",
@@ -111,7 +111,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "tang",
-    title: "당",
+    title: "당나라",
     startYear: 618,
     endYear: 907,
     kind: "era",
@@ -157,7 +157,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "song",
-    title: "송",
+    title: "송나라",
     startYear: 960,
     endYear: 1279,
     kind: "era",
@@ -179,7 +179,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "yuan",
-    title: "원",
+    title: "원나라",
     startYear: 1271,
     endYear: 1368,
     kind: "era",
@@ -192,7 +192,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "ming",
-    title: "명",
+    title: "명나라",
     startYear: 1368,
     endYear: 1644,
     kind: "era",
@@ -275,7 +275,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   },
   {
     id: "qing",
-    title: "청",
+    title: "청나라",
     startYear: 1644,
     endYear: 1912,
     kind: "era",

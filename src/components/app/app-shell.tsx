@@ -46,10 +46,10 @@ export function AppShell() {
           <SearchCommand />
         </>
       ) : (
-        <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+        <div className="flex h-dvh min-w-0 flex-col overflow-hidden bg-background text-foreground">
           <AppHeader />
           <NowStrip />
-          <div className="flex min-h-0 flex-1 md:hidden">
+          <div className="flex min-h-0 min-w-0 flex-1 overflow-x-hidden md:hidden">
             <MobileNow />
           </div>
           <div className="hidden min-h-0 flex-1 md:flex">

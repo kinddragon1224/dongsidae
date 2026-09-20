@@ -28,7 +28,7 @@ export function ArtifactStage({ event }: { event: HistoryEvent }) {
       <ArchiveImage
         asset={visual}
         className="artifact-stage"
-        imgClassName="h-44 w-full object-cover md:h-56"
+        imgClassName="h-32 w-full object-cover md:h-56"
         showCaption
         priority
       />

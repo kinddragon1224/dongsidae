@@ -54,6 +54,7 @@
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   body {
@@ -62,6 +63,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     line-height: 1.55;
+    overflow-x: hidden;
   }
 
   h1,

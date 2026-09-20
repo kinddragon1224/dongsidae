@@ -47,9 +47,9 @@ export function IntroScreen() {
             고리를 굴리거나 아래 문을 여십시오.
           </p>
 
-          <ul className="relative z-10 mt-5 grid grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-4">
+          <ul className="relative z-10 mt-5 grid w-full min-w-0 grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-4">
             {PORTALS.map((portal) => (
-              <li key={portal.year}>
+              <li key={portal.year} className="min-w-0">
                 <HistoricalPortal portal={portal} onOpen={openYear} />
               </li>
             ))}
