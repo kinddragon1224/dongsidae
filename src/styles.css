@@ -152,11 +152,12 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in oklab, var(--color-now) 55%, transparent) 12%,
-    color-mix(in oklab, var(--color-now) 85%, transparent) 50%,
-    color-mix(in oklab, var(--color-now) 55%, transparent) 88%,
+    color-mix(in oklab, var(--color-now) 70%, transparent) 8%,
+    color-mix(in oklab, var(--color-now) 95%, transparent) 50%,
+    color-mix(in oklab, var(--color-now) 70%, transparent) 92%,
     transparent 100%
   );
+  box-shadow: 0 0 12px color-mix(in oklab, var(--color-now) 22%, transparent);
 }
 
 .year-scrubber {

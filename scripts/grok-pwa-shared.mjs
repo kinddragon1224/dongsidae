@@ -158,17 +158,21 @@ export function renderInstallPageHtml(template, { host, url } = {}) {
 }
 
 export function renderWebManifest(hostHeader) {
-  const name = appNameFromHost(hostHeader);
+  const site = readOgSite();
+  const name = String(site.title ?? "").trim() || appNameFromHost(hostHeader);
+  const description = String(site.description ?? "").trim();
   return JSON.stringify(
     {
       name,
       short_name: name,
+      description: description || undefined,
       id: "/",
       start_url: "/",
       scope: "/",
       display: "standalone",
-      background_color: "#000000",
-      theme_color: "#000000",
+      background_color: "#0c0b09",
+      theme_color: "#0c0b09",
+      lang: "ko",
       icons: [
         {
           src: "/__grok/icon-180.png",

@@ -1,6 +1,7 @@
 import type { HistoryEvent } from "@/lib/history/types";
 import { REGION_META } from "@/lib/history/regions";
-import { distanceToYear, formatDistance, formatYearRange } from "@/lib/history/years";
+import { eventTimeLabel } from "@/lib/history/snapshot";
+import { formatYearRange } from "@/lib/history/years";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
   compact?: boolean;
   currentYear?: number;
   onSelect?: (id: string) => void;
+  label?: string;
 };
 
 export function EventCard({
@@ -17,18 +19,11 @@ export function EventCard({
   compact,
   currentYear,
   onSelect,
+  label,
 }: Props) {
   const region = REGION_META[event.region];
-  const dist =
-    currentYear != null
-      ? distanceToYear(event.startYear, event.endYear, currentYear)
-      : null;
   const relative =
-    dist == null
-      ? null
-      : dist === 0
-        ? "이 해"
-        : formatDistance(currentYear!, event.startYear);
+    label ?? (currentYear != null ? eventTimeLabel(event, currentYear) : null);
 
   return (
     <button
@@ -67,11 +62,8 @@ export function EventCard({
           {formatYearRange(event.startYear, event.endYear)}
         </p>
       )}
-      {event.yearNote && !relative && (
-        <p className="mt-1.5 text-[0.6875rem] text-muted-foreground">
-          {event.approximate ? "연대 추정 · " : ""}
-          {event.confidence === "low" ? "논쟁 있음" : event.yearNote}
-        </p>
+      {event.needsVerification && (
+        <p className="mt-1.5 text-[0.625rem] tracking-wide text-subtle">출처 확인 필요</p>
       )}
     </button>
   );

@@ -37,7 +37,7 @@ export function AppHeader() {
         >
           {formatYear(year)}
         </p>
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-1 sm:flex">
           {REGIONS.map((id) => (
             <button
               key={id}

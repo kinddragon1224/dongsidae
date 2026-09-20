@@ -5,7 +5,7 @@ import type {
   Region,
   Significance,
   Source,
-} from "@/lib/history/types";
+} from "../lib/history/types.ts";
 
 export type EventDraft = {
   id: string;
@@ -25,20 +25,27 @@ export type EventDraft = {
   sources?: Source[];
   confidence?: Confidence;
   tags?: string[];
+  needsVerification?: boolean;
 };
 
 export function defineEvents(
   region: Region,
   drafts: EventDraft[],
 ): HistoryEvent[] {
-  return drafts.map((draft) => ({
-    region,
-    kind: draft.kind ?? "event",
-    significance: draft.significance ?? 3,
-    categories: draft.categories ?? [],
-    confidence: draft.confidence ?? "high",
-    ...draft,
-  }));
+  return drafts.map((draft) => {
+    const sources = draft.sources;
+    const hasSources = Boolean(sources && sources.length > 0);
+    return {
+      region,
+      kind: draft.kind ?? "event",
+      significance: draft.significance ?? 3,
+      categories: draft.categories ?? [],
+      confidence: draft.confidence ?? "high",
+      ...draft,
+      sources,
+      needsVerification: draft.needsVerification ?? !hasSources,
+    };
+  });
 }
 
 export const S = {

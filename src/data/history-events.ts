@@ -1,8 +1,8 @@
-import { christianityEvents } from "@/data/events/christianity";
-import { eastAsiaEvents } from "@/data/events/east-asia";
-import { koreaEvents } from "@/data/events/korea";
-import { worldEvents } from "@/data/events/world";
-import type { HistoryEvent } from "@/lib/history/types";
+import { christianityEvents } from "./events/christianity.ts";
+import { eastAsiaEvents } from "./events/east-asia.ts";
+import { koreaEvents } from "./events/korea.ts";
+import { worldEvents } from "./events/world.ts";
+import type { HistoryEvent } from "../lib/history/types.ts";
 
 export const HISTORY_EVENTS: HistoryEvent[] = [
   ...christianityEvents,

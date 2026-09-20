@@ -25,12 +25,15 @@ export function DialogOverlay({
 
 export function DialogContent({
   className,
+  overlayClassName,
   children,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  overlayClassName?: string;
+}) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         className={cn(
           "fixed z-50 border border-border bg-popover text-popover-foreground shadow-[var(--shadow-border)]",

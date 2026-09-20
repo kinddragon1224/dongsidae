@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import { DEFAULT_YEAR, ZOOM_LEVELS } from "./constants";
-import type { Region, ZoomId, ZoomLevel } from "./types";
-import { REGIONS } from "./types";
-import { addYears, clampYear } from "./years";
+import { YEAR_MAX, YEAR_MIN } from "./catalog.ts";
+import { DEFAULT_YEAR, ZOOM_LEVELS } from "./constants.ts";
+import type { Region, ZoomId, ZoomLevel } from "./types.ts";
+import { REGIONS } from "./types.ts";
+import { addYears, clampYear, signedYearDistance } from "./years.ts";
 
 export type RegionFilter = Record<Region, boolean>;
 
@@ -27,7 +28,15 @@ type TimelineState = {
   setExplainOpen: (open: boolean) => void;
   setYearInputOpen: (open: boolean) => void;
   toggleRegion: (region: Region) => void;
+  setRegions: (regions: RegionFilter) => void;
   goToEvent: (id: string, year: number) => void;
+  hydrateFromUrl: (next: {
+    year: number;
+    zoomId: ZoomId;
+    regions: RegionFilter;
+    eventId: string | null;
+    entered?: boolean;
+  }) => void;
 };
 
 const allOn = (): RegionFilter => ({
@@ -36,6 +45,10 @@ const allOn = (): RegionFilter => ({
   east_asia: true,
   world: true,
 });
+
+function bound(year: number): number {
+  return clampYear(year, YEAR_MIN, YEAR_MAX);
+}
 
 export const useTimeline = create<TimelineState>((set, get) => ({
   year: DEFAULT_YEAR,
@@ -48,18 +61,22 @@ export const useTimeline = create<TimelineState>((set, get) => ({
   regions: allOn(),
   lastJump: 0,
   setYear: (year) => {
-    const next = clampYear(year);
+    const next = bound(year);
     const prev = get().year;
     set({
       year: next,
-      lastJump: next - prev,
+      lastJump: signedYearDistance(prev, next),
       explainOpen: false,
     });
   },
   shift: (delta) => {
     const { year } = get();
-    const next = clampYear(addYears(year, delta));
-    set({ year: next, lastJump: next - year, explainOpen: false });
+    const next = bound(addYears(year, delta));
+    set({
+      year: next,
+      lastJump: signedYearDistance(year, next),
+      explainOpen: false,
+    });
   },
   setZoom: (id) => set({ zoomId: id }),
   cycleZoom: (dir) => {
@@ -71,7 +88,7 @@ export const useTimeline = create<TimelineState>((set, get) => ({
   enter: (year) =>
     set({
       entered: true,
-      year: year != null ? clampYear(year) : get().year,
+      year: year != null ? bound(year) : get().year,
       selectedId: null,
       explainOpen: false,
     }),
@@ -91,12 +108,25 @@ export const useTimeline = create<TimelineState>((set, get) => ({
     if (!REGIONS.some((key) => regions[key])) return;
     set({ regions });
   },
+  setRegions: (regions) => {
+    if (!REGIONS.some((key) => regions[key])) return;
+    set({ regions });
+  },
   goToEvent: (id, year) =>
     set({
       selectedId: id,
-      year: clampYear(year),
+      year: bound(year),
       entered: true,
       searchOpen: false,
+      explainOpen: false,
+    }),
+  hydrateFromUrl: (next) =>
+    set({
+      year: bound(next.year),
+      zoomId: next.zoomId,
+      regions: next.regions,
+      selectedId: next.eventId,
+      entered: next.entered ?? true,
       explainOpen: false,
     }),
 }));

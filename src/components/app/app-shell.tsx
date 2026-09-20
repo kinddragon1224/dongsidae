@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { IntroScreen } from "@/components/app/intro-screen";
 import { AppHeader } from "@/components/app/app-header";
 import { ExplainPanel } from "@/components/explain/explain-panel";
@@ -11,7 +11,13 @@ import { TimelineView } from "@/components/timeline/timeline-view";
 import { YearInputDialog } from "@/components/timeline/year-input";
 import { getEventById } from "@/lib/history/query";
 import { getZoom, useTimeline } from "@/lib/history/store";
-import { parseYearInput } from "@/lib/history/years";
+import { formatYear } from "@/lib/history/years";
+import {
+  filterFromRegions,
+  parseTimelineSearch,
+  regionsFromFilter,
+  serializeTimelineSearch,
+} from "@/lib/history/url";
 
 export function AppShell() {
   const entered = useTimeline((s) => s.entered);
@@ -20,6 +26,7 @@ export function AppShell() {
   const selectedEvent = selectedId ? getEventById(selectedId) : undefined;
 
   useUrlSync();
+  useDocumentTitle();
   useKeyboard();
 
   useEffect(() => {
@@ -47,14 +54,6 @@ export function AppShell() {
         <TimelineView />
       </div>
       <TimeControls />
-      {selectedEvent && (
-        <button
-          type="button"
-          aria-label="상세 닫기"
-          className="fixed inset-0 z-30 bg-background/50 md:right-[28rem] md:bg-background/20"
-          onClick={() => select(null)}
-        />
-      )}
       <EventDetail />
       <SearchCommand />
       <YearInputDialog />
@@ -63,36 +62,101 @@ export function AppShell() {
   );
 }
 
-function useUrlSync() {
+function useDocumentTitle() {
   const year = useTimeline((s) => s.year);
   const entered = useTimeline((s) => s.entered);
-  const enter = useTimeline((s) => s.enter);
+  const selectedId = useTimeline((s) => s.selectedId);
+  const event = selectedId ? getEventById(selectedId) : undefined;
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get("y");
-    if (!raw) return;
-    const parsed = parseYearInput(raw);
-    if (parsed != null) enter(parsed);
-  }, [enter]);
+    if (event) {
+      document.title = `${event.title} · ${formatYear(event.startYear)} · 동시대`;
+      return;
+    }
+    if (entered) {
+      document.title = `동시대 · ${formatYear(year)}`;
+      return;
+    }
+    document.title = "동시대";
+  }, [event, entered, year]);
+}
+
+function useUrlSync() {
+  const year = useTimeline((s) => s.year);
+  const zoomId = useTimeline((s) => s.zoomId);
+  const selectedId = useTimeline((s) => s.selectedId);
+  const regions = useTimeline((s) => s.regions);
+  const entered = useTimeline((s) => s.entered);
+  const hydrateFromUrl = useTimeline((s) => s.hydrateFromUrl);
+  const applying = useRef(false);
+  const lastPushed = useRef("");
 
   useEffect(() => {
+    const params = window.location.search;
+    if (!params) return;
+    const parsed = parseTimelineSearch(params);
+    applying.current = true;
+    hydrateFromUrl({
+      year: parsed.year,
+      zoomId: parsed.zoomId,
+      regions: filterFromRegions(parsed.regions),
+      eventId: parsed.eventId,
+      entered: true,
+    });
+    lastPushed.current = serializeTimelineSearch(parsed);
+    queueMicrotask(() => {
+      applying.current = false;
+    });
+  }, [hydrateFromUrl]);
+
+  useEffect(() => {
+    function onPop() {
+      const parsed = parseTimelineSearch(window.location.search);
+      applying.current = true;
+      if (!window.location.search) {
+        useTimeline.getState().exitToIntro();
+      } else {
+        hydrateFromUrl({
+          year: parsed.year,
+          zoomId: parsed.zoomId,
+          regions: filterFromRegions(parsed.regions),
+          eventId: parsed.eventId,
+          entered: true,
+        });
+      }
+      lastPushed.current = window.location.search.replace(/^\?/, "");
+      queueMicrotask(() => {
+        applying.current = false;
+      });
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [hydrateFromUrl]);
+
+  useEffect(() => {
+    if (applying.current) return;
     if (!entered) {
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("y")) {
-        url.searchParams.delete("y");
-        window.history.replaceState(null, "", url.pathname);
+      if (window.location.search) {
+        window.history.pushState(null, "", window.location.pathname);
+        lastPushed.current = "";
       }
       return;
     }
-    const url = new URL(window.location.href);
-    url.searchParams.set("y", String(year));
-    window.history.replaceState(
-      null,
-      "",
-      `${url.pathname}?${url.searchParams.toString()}`,
-    );
-  }, [year, entered]);
+    const encoded = serializeTimelineSearch({
+      year,
+      zoomId,
+      regions: regionsFromFilter(regions),
+      eventId: selectedId,
+    });
+    if (encoded === lastPushed.current) return;
+    const next = `${window.location.pathname}?${encoded}`;
+    const significant =
+      selectedId !== parseTimelineSearch(lastPushed.current).eventId ||
+      lastPushed.current === "";
+    if (significant) window.history.pushState(null, "", next);
+    else window.history.replaceState(null, "", next);
+    lastPushed.current = encoded;
+  }, [year, zoomId, selectedId, regions, entered]);
 }
 
 function useKeyboard() {

@@ -39,6 +39,8 @@ export type HistoryEvent = {
   sources?: Source[];
   confidence: Confidence;
   tags?: string[];
+  /** True when sources are missing or the date still needs a specialist check. */
+  needsVerification?: boolean;
 };
 
 export type ZoomId = "year" | "decade" | "halfcentury" | "century" | "era";
@@ -58,3 +60,5 @@ export type EraShortcut = {
   year: number;
   hint: string;
 };
+
+export type PresenceLabel = "이 해" | "진행 중" | "재위 중" | "시대";

@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { layoutCards } from "@/lib/history/layout";
 import { nearestEvent, selectColumnView } from "@/lib/history/query";
 import { REGION_META } from "@/lib/history/regions";
 import { useTimeline, useZoom } from "@/lib/history/store";
-import type { Region } from "@/lib/history/types";
+import type { HistoryEvent, Region } from "@/lib/history/types";
 import {
   addYears,
-  distanceToYear,
-  formatDistance,
+  civilYearToOrdinal,
   formatYearBare,
   formatYearShort,
   spansYear,
   ticksAround,
 } from "@/lib/history/years";
+import { YEAR_MAX, YEAR_MIN } from "@/lib/history/catalog";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 
@@ -45,19 +46,37 @@ export function TimelineView() {
   useEffect(() => {
     const el = surfaceRef.current;
     if (!el) return;
+    let acc = 0;
+    let raf = 0;
+    const threshold = 56;
+
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const dir = e.deltaY > 0 ? 1 : -1;
-      shift(dir * zoom.step);
+      const pixels =
+        e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * height : e.deltaY;
+      acc += pixels;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        if (Math.abs(acc) < threshold) return;
+        const dir = acc > 0 ? 1 : -1;
+        acc = 0;
+        shift(dir * zoom.step);
+      });
     };
+
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, [shift, zoom.step]);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [shift, zoom.step, height]);
 
   const pxPerYear = (height * 0.5) / zoom.halfWindow;
   const nowY = height * NOW;
   const visible = ORDER.filter((id) => regions[id]);
-  const ticks = ticksAround(year, zoom.halfWindow, zoom.tick);
+  const ticks = ticksAround(year, zoom.halfWindow, zoom.tick, YEAR_MIN, YEAR_MAX);
+  const yearOrd = civilYearToOrdinal(year);
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (e.button !== 0) return;
@@ -103,7 +122,7 @@ export function TimelineView() {
       >
         <div className="relative h-full">
           {ticks.map((tick) => {
-            const y = nowY + (tick - year) * pxPerYear;
+            const y = nowY + (civilYearToOrdinal(tick) - yearOrd) * pxPerYear;
             if (y < 8 || y > height - 8) return null;
             const major = tick % (zoom.tick * 5) === 0;
             return (
@@ -158,6 +177,7 @@ export function TimelineView() {
             key={id}
             region={id}
             year={year}
+            yearOrd={yearOrd}
             nowY={nowY}
             pxPerYear={pxPerYear}
             height={height}
@@ -175,6 +195,7 @@ export function TimelineView() {
 function RegionColumn({
   region,
   year,
+  yearOrd,
   nowY,
   pxPerYear,
   height,
@@ -185,6 +206,7 @@ function RegionColumn({
 }: {
   region: Region;
   year: number;
+  yearOrd: number;
   nowY: number;
   pxPerYear: number;
   height: number;
@@ -196,39 +218,36 @@ function RegionColumn({
   const zoom = useZoom();
   const view = selectColumnView(region, year, zoom);
   const meta = REGION_META[region];
-  const minGap = 62;
   const fallback = nearestEvent(region, year);
+  const chip = view.now.headline;
 
-  const placed = view.events
-    .map((event) => {
-      const placeYear =
-        event.kind === "era" &&
-        event.endYear != null &&
-        spansYear(event.startYear, event.endYear, year)
-          ? year
-          : event.startYear;
-      return {
-        event,
-        placeYear,
-        y: nowY + (placeYear - year) * pxPerYear,
-      };
-    })
-    .filter((item) => item.y > 64 && item.y < height - 32)
-    .sort((a, b) => {
-      if (a.placeYear !== b.placeYear) return a.placeYear - b.placeYear;
-      const aEra = a.event.kind === "era" ? 1 : 0;
-      const bEra = b.event.kind === "era" ? 1 : 0;
-      if (aEra !== bEra) return aEra - bEra;
-      return b.event.significance - a.event.significance;
-    });
-
-  for (let i = 1; i < placed.length; i += 1) {
-    const prev = placed[i - 1]!;
-    const curr = placed[i]!;
-    if (curr.y < prev.y + minGap) {
-      curr.y = prev.y + minGap;
-    }
-  }
+  const placed = useMemo(() => {
+    const band = 52;
+    const items = view.events
+      .filter((event) => event.startYear !== year)
+      .filter((event) => !spansYear(event.startYear, event.endYear, year))
+      .map((event) => {
+        const placeYear = event.startYear;
+        const naturalY =
+          nowY + (civilYearToOrdinal(placeYear) - yearOrd) * pxPerYear;
+        let targetY = naturalY;
+        if (Math.abs(naturalY - nowY) < band) {
+          targetY = naturalY >= nowY ? nowY + band : nowY - band;
+        }
+        return {
+          id: event.id,
+          event,
+          placeYear,
+          naturalY,
+          targetY,
+          significance: event.significance,
+        };
+      });
+    return layoutCards(
+      items.filter((item) => item.targetY > 72 && item.targetY < height - 28),
+      64,
+    );
+  }, [view.events, nowY, yearOrd, pxPerYear, height, year]);
 
   return (
     <section className="relative border-r border-border last:border-r-0">
@@ -247,21 +266,44 @@ function RegionColumn({
         )}
       </header>
 
+      <NowChip
+        title={chip.title}
+        label={chip.label}
+        token={meta.token}
+        nowY={nowY}
+        active={chip.event?.id === selectedId}
+        onClick={() => chip.event && onSelect(chip.event.id)}
+      />
+
       {placed.map((item) => (
         <div
           key={item.event.id}
-          className="absolute right-2 left-2 z-10"
+          className="absolute z-10"
           style={{
             top: item.y,
+            left: item.lane === 0 ? "0.5rem" : "48%",
+            right: item.lane === 0 ? "48%" : "0.5rem",
             transform: "translateY(-50%)",
             transition: reduced ? "none" : "top 250ms var(--ease-out)",
           }}
         >
+          {Math.abs(item.y - item.naturalY) > 3 && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute w-px bg-primary/35"
+              style={{
+                left: "-0.35rem",
+                top: item.naturalY < item.y ? `calc(50% - ${item.y - item.naturalY}px)` : "50%",
+                height: Math.abs(item.y - item.naturalY),
+              }}
+            />
+          )}
+          <YearAnchor naturalY={item.naturalY} cardY={item.y} />
           <button
             type="button"
             onClick={() => onSelect(item.event.id)}
             className={cn(
-              "w-full min-h-12 rounded-md border bg-card/95 px-2.5 py-2.5 text-left shadow-[var(--shadow-border)]",
+              "w-full min-h-12 rounded-md border bg-card/95 px-2.5 py-2 text-left shadow-[var(--shadow-border)]",
               "hover:shadow-[var(--shadow-border-hover)]",
               item.event.id === selectedId || item.placeYear === year
                 ? "border-primary/35"
@@ -280,12 +322,19 @@ function RegionColumn({
               item.event.endYear !== item.event.startYear
                 ? `–${item.event.endYear < 0 ? Math.abs(item.event.endYear) : item.event.endYear}`
                 : ""}
+              {item.cluster.length > 0 ? `  · +${item.cluster.length}` : ""}
             </p>
           </button>
+          {item.cluster.length > 0 && (
+            <ClusterList
+              events={item.cluster.map((row) => row.event)}
+              onSelect={onSelect}
+            />
+          )}
         </div>
       ))}
 
-      {placed.length === 0 && fallback && (
+      {placed.length === 0 && !chip.event && fallback && (
         <button
           type="button"
           onClick={() => {
@@ -293,17 +342,86 @@ function RegionColumn({
             onSelect(fallback.id);
           }}
           className="absolute right-2 left-2 z-10 rounded-md border border-border bg-card/95 px-2.5 py-3 text-left"
-          style={{ top: nowY + 18 }}
+          style={{ top: nowY + 28 }}
         >
           <p className="text-[0.625rem] tracking-wide text-subtle">가까운 기록</p>
           <p className="mt-1 font-serif text-sm text-foreground">{fallback.title}</p>
-          <p className="mt-0.5 font-serif text-xs tabular-nums text-muted-foreground">
-            {distanceToYear(fallback.startYear, fallback.endYear, year) === 0
-              ? "이 해"
-              : formatDistance(year, fallback.startYear)}
-          </p>
         </button>
       )}
     </section>
+  );
+}
+
+function NowChip({
+  title,
+  label,
+  token,
+  nowY,
+  active,
+  onClick,
+}: {
+  title: string;
+  label: string;
+  token: string;
+  nowY: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "absolute right-2 left-2 z-20 flex min-h-10 items-center gap-2 rounded-md border px-2.5 py-1.5 text-left",
+        "bg-background/90 shadow-[var(--shadow-border)]",
+        active ? "border-primary/45" : "border-primary/25",
+      )}
+      style={{ top: nowY, transform: "translateY(-50%)" }}
+    >
+      <span className="size-1.5 shrink-0 rounded-full" style={{ background: token }} />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-serif text-xs text-foreground md:text-sm">
+          {title}
+        </span>
+        {label ? (
+          <span className="block text-[0.625rem] tracking-wide text-subtle">{label}</span>
+        ) : null}
+      </span>
+    </button>
+  );
+}
+
+function YearAnchor({ naturalY, cardY }: { naturalY: number; cardY: number }) {
+  if (Math.abs(naturalY - cardY) < 3) return null;
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute top-1/2 -left-2 size-1 rounded-full bg-primary/70"
+      title="실제 연도 위치"
+    />
+  );
+}
+
+function ClusterList({
+  events,
+  onSelect,
+}: {
+  events: HistoryEvent[];
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <ul className="mt-1 space-y-0.5">
+      {events.map((event) => (
+        <li key={event.id}>
+          <button
+            type="button"
+            onClick={() => onSelect(event.id)}
+            className="w-full truncate rounded px-1 py-1 text-left text-[0.625rem] text-subtle hover:text-foreground"
+          >
+            {event.title}
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }

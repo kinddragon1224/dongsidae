@@ -16,7 +16,7 @@ export function IntroScreen() {
         <p className="font-serif text-sm tracking-wide text-muted-foreground">
           동시대
         </p>
-        <p className="text-xs tracking-wide text-subtle">CHRONO</p>
+        <p className="text-xs tracking-wide text-subtle">같은 시간</p>
       </header>
 
       <div className="flex flex-1 flex-col justify-center px-5 pb-10 md:px-10">

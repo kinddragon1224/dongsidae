@@ -1,6 +1,7 @@
 import { yearSnapshot } from "@/lib/history/query";
 import { REGION_META } from "@/lib/history/regions";
 import { useTimeline } from "@/lib/history/store";
+import { cn } from "@/lib/utils";
 
 export function NowStrip() {
   const year = useTimeline((s) => s.year);
@@ -10,7 +11,10 @@ export function NowStrip() {
 
   return (
     <div className="hidden border-b border-border md:block">
-      <div className="grid grid-cols-4">
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))` }}
+      >
         {rows.map((row) => (
           <button
             key={row.region}
@@ -27,7 +31,14 @@ export function NowStrip() {
                 {REGION_META[row.region].short}
                 {row.relative ? ` · ${row.relative}` : ""}
               </span>
-              <span className="block truncate text-sm text-foreground">
+              <span
+                className={cn(
+                  "block truncate text-sm",
+                  row.relative === "이 해" || row.relative === "재위 중" || row.relative === "시대"
+                    ? "text-foreground"
+                    : "text-muted-foreground",
+                )}
+              >
                 {row.title}
               </span>
             </span>

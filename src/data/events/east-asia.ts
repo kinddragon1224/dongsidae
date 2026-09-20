@@ -1,4 +1,4 @@
-import { S, defineEvents } from "@/data/schema";
+import { S, defineEvents } from "../schema.ts";
 
 export const eastAsiaEvents = defineEvents("east_asia", [
   {

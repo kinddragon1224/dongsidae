@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { explainYear } from "@/lib/ai/explain";
 import { Button } from "@/components/ui/button";
-import { contemporaneous } from "@/lib/history/query";
-import { useTimeline, useZoom } from "@/lib/history/store";
+import { getYearSnapshot, snapshotToAiContext } from "@/lib/history/snapshot";
+import { useTimeline } from "@/lib/history/store";
 import { formatYear } from "@/lib/history/years";
 
 export function ExplainPanel() {
   const open = useTimeline((s) => s.explainOpen);
   const setOpen = useTimeline((s) => s.setExplainOpen);
   const year = useTimeline((s) => s.year);
-  const zoom = useZoom();
   const [text, setText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,21 +24,8 @@ export function ExplainPanel() {
   async function run() {
     setLoading(true);
     setError(null);
-    const events = contemporaneous(year, Math.min(zoom.halfWindow, 80))
-      .filter((event) => event.kind !== "era")
-      .slice(0, 20)
-      .map((event) => ({
-        id: event.id,
-        title: event.title,
-        startYear: event.startYear,
-        endYear: event.endYear,
-        region: event.region,
-        summary: event.summary,
-        yearNote: event.yearNote,
-        confidence: event.confidence,
-        kind: event.kind,
-      }));
-
+    const snap = getYearSnapshot(year, { nearbyRange: 10, nearbyLimit: 3 });
+    const events = snapshotToAiContext(snap, 28);
     const result = await explainYear({ data: { year, events } });
     setLoading(false);
     if (result.ok) setText(result.text);
@@ -64,7 +50,7 @@ export function ExplainPanel() {
         </button>
       </div>
       <p className="mt-2 text-xs text-subtle">
-        기록된 사건만 재료로 삼습니다. 새 사실은 만들지 않습니다.
+        기록된 사건만 재료로 삼습니다. 이 해 / 진행 중 / 전후를 섞지 않습니다.
       </p>
       {!text && !loading && !error && (
         <Button className="mt-4 w-full" onClick={() => void run()}>

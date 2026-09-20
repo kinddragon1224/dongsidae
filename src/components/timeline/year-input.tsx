@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { YEAR_MAX, YEAR_MIN } from "@/lib/history/catalog";
 import { useTimeline } from "@/lib/history/store";
-import { YEAR_MAX, YEAR_MIN, parseYearInput } from "@/lib/history/years";
+import { formatYear, parseYearInput } from "@/lib/history/years";
 
 export function YearInputDialog() {
   const open = useTimeline((s) => s.yearInputOpen);
@@ -37,7 +38,7 @@ export function YearInputDialog() {
       <DialogContent className="top-1/2 left-1/2 w-[min(24rem,calc(100%-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-xl p-6">
         <DialogTitle>연도 이동</DialogTitle>
         <DialogDescription className="mt-1">
-          {YEAR_MIN}년부터 {YEAR_MAX}년까지. 기원전은 음수 또는 ‘기원전 4’.
+          {formatYear(YEAR_MIN)}부터 {formatYear(YEAR_MAX)}까지. 기원전은 ‘기원전 4’ 또는 음수.
         </DialogDescription>
         <form
           className="mt-5 flex flex-col gap-3"
