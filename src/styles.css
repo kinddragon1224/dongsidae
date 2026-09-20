@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-serif: "Noto Serif KR", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Noto Sans KR", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-background: #0c0b09;
+  --color-foreground: #e8e2d6;
+  --color-card: #141210;
+  --color-card-foreground: #e8e2d6;
+  --color-popover: #161411;
+  --color-popover-foreground: #e8e2d6;
+  --color-primary: #d4c4a8;
+  --color-primary-foreground: #0c0b09;
+  --color-secondary: #1c1915;
+  --color-secondary-foreground: #e8e2d6;
+  --color-muted: #1c1915;
+  --color-muted-foreground: #a39888;
+  --color-accent: #1f1b16;
+  --color-accent-foreground: #e8e2d6;
+  --color-destructive: #b4554a;
+  --color-border: rgb(232 226 214 / 0.12);
+  --color-input: rgb(232 226 214 / 0.14);
+  --color-ring: #d4c4a8;
+  --color-now: #eadfcb;
+  --color-subtle: #7a7268;
+  --color-region-christianity: #cbb89a;
+  --color-region-korea: #93a897;
+  --color-region-east-asia: #c49282;
+  --color-region-world: #8b9aab;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --text-year: clamp(2.75rem, 7vw, 5.25rem);
+  --text-brand: clamp(2rem, 5vw, 3.25rem);
+
+  --shadow-border: 0 0 0 1px rgb(232 226 214 / 0.08);
+  --shadow-border-hover: 0 0 0 1px rgb(232 226 214 / 0.16);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-serif);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-primary) 28%, transparent);
+    color: var(--color-foreground);
+  }
+}
+
+:root {
+  --now-offset: 42%;
+  --motion-micro: 80ms;
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.year-swap {
+  animation: year-swap var(--motion-fast) var(--ease-out);
+}
+
+@keyframes year-swap {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-in > * {
+  animation: fade-up var(--motion-slow) var(--ease-out) both;
+}
+.stagger-in > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-in > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.stagger-in > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.stagger-in > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.stagger-in > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.now-rule {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-now) 55%, transparent) 12%,
+    color-mix(in oklab, var(--color-now) 85%, transparent) 50%,
+    color-mix(in oklab, var(--color-now) 55%, transparent) 88%,
+    transparent 100%
+  );
+}
+
+.year-scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.75rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.year-scrubber::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-foreground) 14%, transparent);
+}
+
+.year-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -12px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  border: 0;
+}
+
+.year-scrubber::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-foreground) 14%, transparent);
+}
+
+.year-scrubber::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .year-swap,
+  .stagger-in > * {
+    animation: none;
+  }
+}

@@ -1,0 +1,30 @@
+node_modules
+.vercel
+.nitro
+.output
+.tanstack
+dist
+screenshots
+artifacts
+.project_id
+.env
+.env.*
+*.log
+.DS_Store
+
+# sandbox contract — not part of the product
+AGENTS.md
+
+.grok/skills
+.grok/references
+.grok/status
+.grok/preview.log
+.grok/og-pending
+.grok/*.png
+.grok/*.html
+.grok/*.jpg
+.grok/*.tmp
+
+# generated
+coverage
+*.tsbuildinfo
