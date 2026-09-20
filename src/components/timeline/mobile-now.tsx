@@ -7,6 +7,8 @@ import { useTimeline, useZoom } from "@/lib/history/store";
 import type { Region } from "@/lib/history/types";
 import { REGIONS } from "@/lib/history/types";
 import { formatYearBare } from "@/lib/history/years";
+import { jumpThroughTime } from "@/lib/visuals/jump";
+import { visualForYear } from "@/lib/visuals/registry";
 import { cn } from "@/lib/utils";
 import { EventCard } from "./event-card";
 
@@ -16,7 +18,6 @@ export function MobileNow() {
   const select = useTimeline((s) => s.select);
   const regions = useTimeline((s) => s.regions);
   const toggleRegion = useTimeline((s) => s.toggleRegion);
-  const setYear = useTimeline((s) => s.setYear);
   const shift = useTimeline((s) => s.shift);
   const zoomId = useTimeline((s) => s.zoomId);
   const setZoom = useTimeline((s) => s.setZoom);
@@ -29,6 +30,7 @@ export function MobileNow() {
   const sectionRefs = useRef<Partial<Record<Region, HTMLElement | null>>>({});
   const headline = yearHeadline(year);
   const visible = REGIONS.filter((id) => regions[id]);
+  const wash = visualForYear(year);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -43,16 +45,25 @@ export function MobileNow() {
           onPointerMove={swipe.onPointerMove}
           onPointerUp={swipe.onPointerUp}
           onPointerCancel={swipe.onPointerUp}
-          className="flex min-h-[4.5rem] w-full touch-manipulation flex-col items-center justify-center px-1 text-center"
+          className="relative flex min-h-[4.5rem] w-full touch-manipulation flex-col items-center justify-center overflow-hidden px-1 text-center"
           aria-label="연도 입력. 좌우로 밀면 연도가 바뀝니다."
         >
+          {wash ? (
+            <span aria-hidden className="year-wash">
+              <img
+                src={wash.src}
+                alt=""
+                className="archive-photo h-full w-full object-cover"
+              />
+            </span>
+          ) : null}
           <span
             key={year}
-            className="year-swap block font-serif text-5xl leading-none font-medium tracking-tight text-primary tabular-nums"
+            className="year-swap relative block font-serif text-5xl leading-none font-medium tracking-tight text-primary tabular-nums"
           >
             {formatYearBare(year)}
           </span>
-          <span className="mt-2 block truncate text-sm text-muted-foreground">
+          <span className="relative mt-2 block truncate text-sm text-muted-foreground">
             {headline}
           </span>
         </button>
@@ -207,7 +218,7 @@ export function MobileNow() {
             <button
               key={era.id}
               type="button"
-              onClick={() => setYear(era.year)}
+              onClick={() => jumpThroughTime(era.year)}
               className={cn(
                 "h-11 shrink-0 rounded-full px-3.5 text-sm",
                 year === era.year

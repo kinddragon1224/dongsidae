@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, Link2 } from "lucide-react";
+import { ArtifactStage } from "@/components/visual/artifact-stage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +18,11 @@ import {
   addYears,
   formatDistance,
   formatYear,
+  formatYearBare,
   formatYearRange,
 } from "@/lib/history/years";
+import { jumpThroughTime } from "@/lib/visuals/jump";
+import { visualForYear } from "@/lib/visuals/registry";
 import { cn } from "@/lib/utils";
 
 export function EventDetail() {
@@ -40,7 +44,6 @@ export function EventDetail() {
 
 function DetailBody({ eventId }: { eventId: string }) {
   const select = useTimeline((s) => s.select);
-  const setYear = useTimeline((s) => s.setYear);
   const event = getEventById(eventId);
   if (!event) return null;
   const current = event;
@@ -55,17 +58,20 @@ function DetailBody({ eventId }: { eventId: string }) {
 
   return (
     <DialogContent
-      overlayClassName="bg-background/50 md:right-[28rem] md:bg-background/25"
+      overlayClassName="bg-background/50 md:right-[28rem] md:bg-background/25 xl:right-[32rem]"
       className={cn(
         "inset-x-0 bottom-0 flex max-h-[88vh] w-full flex-col rounded-t-xl border-t p-0",
         "md:inset-y-0 md:right-0 md:left-auto md:w-[28rem] md:rounded-none md:border-t-0 md:border-l",
+        "xl:w-[32rem]",
       )}
       aria-describedby="event-summary"
     >
       <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-border md:hidden" />
-      <div className="relative flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+      <DialogCloseButton className="z-30 bg-background/70" />
+      <ArtifactStage event={current} />
+      <div className="relative flex items-start justify-between gap-3 border-b border-border px-5 py-4 pr-12">
         <div className="min-w-0">
-          <p className="text-[0.6875rem] tracking-wide text-subtle">
+          <p className="text-xs tracking-wide text-subtle">
             {region.label} · {KIND_LABEL[current.kind]}
           </p>
           <DialogTitle className="mt-1 font-serif text-xl leading-snug text-foreground">
@@ -76,7 +82,6 @@ function DetailBody({ eventId }: { eventId: string }) {
             {formatYearRange(current.startYear, current.endYear)}
           </DialogDescription>
         </div>
-        <DialogCloseButton />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
@@ -90,9 +95,7 @@ function DetailBody({ eventId }: { eventId: string }) {
         )}
         {current.meaning && (
           <section className="mt-6">
-            <h3 className="text-[0.6875rem] tracking-wide text-subtle">
-              시대적 의미
-            </h3>
+            <h3 className="text-xs tracking-wide text-subtle">시대적 의미</h3>
             <p className="mt-2 text-sm leading-relaxed text-foreground">
               {current.meaning}
             </p>
@@ -119,9 +122,7 @@ function DetailBody({ eventId }: { eventId: string }) {
 
         {current.people && current.people.length > 0 && (
           <section className="mt-6">
-            <h3 className="text-[0.6875rem] tracking-wide text-subtle">
-              관련 인물
-            </h3>
+            <h3 className="text-xs tracking-wide text-subtle">관련 인물</h3>
             <p className="mt-2 text-sm text-foreground">
               {current.people.join(" · ")}
             </p>
@@ -130,7 +131,7 @@ function DetailBody({ eventId }: { eventId: string }) {
 
         <section className="mt-8">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[0.6875rem] tracking-wide text-subtle">
+            <h3 className="text-xs tracking-wide text-subtle">
               {formatYear(current.startYear)}의 세계
             </h3>
             <Button
@@ -138,8 +139,8 @@ function DetailBody({ eventId }: { eventId: string }) {
               size="sm"
               className="h-11 px-2"
               onClick={() => {
-                setYear(current.startYear);
                 select(null);
+                jumpThroughTime(current.startYear);
               }}
             >
               이 해로 이동
@@ -154,7 +155,7 @@ function DetailBody({ eventId }: { eventId: string }) {
               if (active.length === 0 && nearby.length === 0) return null;
               return (
                 <div key={row.region}>
-                  <p className="mb-1.5 flex items-center gap-2 text-[0.6875rem] tracking-wide text-subtle">
+                  <p className="mb-1.5 flex items-center gap-2 text-xs tracking-wide text-subtle">
                     <span
                       className="size-1.5 rounded-full"
                       style={{ background: REGION_META[row.region].token }}
@@ -188,40 +189,38 @@ function DetailBody({ eventId }: { eventId: string }) {
         </section>
 
         <section className="mt-8">
-          <h3 className="text-[0.6875rem] tracking-wide text-subtle">
-            전후 비교
-          </h3>
-          <div className="mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-border bg-border">
+          <h3 className="text-xs tracking-wide text-subtle">전후 비교</h3>
+          <div className="triptych mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-border bg-border">
             <CompareColumn
               year={beforeYear}
               caption="50년 전"
-              onJump={() => setYear(beforeYear)}
+              onJump={() => jumpThroughTime(beforeYear)}
             />
             <CompareColumn
               year={current.startYear}
               caption="이 사건"
               current
-              onJump={() => setYear(current.startYear)}
+              onJump={() => jumpThroughTime(current.startYear)}
             />
             <CompareColumn
               year={afterYear}
               caption="50년 후"
-              onJump={() => setYear(afterYear)}
+              onJump={() => jumpThroughTime(afterYear)}
             />
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Button variant="outline" size="sm" onClick={() => setYear(beforeYear)}>
+            <Button variant="outline" size="sm" onClick={() => jumpThroughTime(beforeYear)}>
               <ArrowLeft className="size-3.5" />
               50년 전
             </Button>
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setYear(current.startYear)}
+              onClick={() => jumpThroughTime(current.startYear)}
             >
               이 사건
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setYear(afterYear)}>
+            <Button variant="outline" size="sm" onClick={() => jumpThroughTime(afterYear)}>
               50년 후
               <ArrowRight className="size-3.5" />
             </Button>
@@ -230,17 +229,14 @@ function DetailBody({ eventId }: { eventId: string }) {
 
         {related.length > 0 && (
           <section className="mt-8">
-            <h3 className="text-[0.6875rem] tracking-wide text-subtle">
-              관련 사건
-            </h3>
+            <h3 className="text-xs tracking-wide text-subtle">관련 사건</h3>
             <ul className="mt-3 space-y-1">
               {related.map((other) => (
                 <li key={other.id}>
                   <button
                     type="button"
                     onClick={() => {
-                      setYear(other.startYear);
-                      select(other.id);
+                      jumpThroughTime(other.startYear, () => select(other.id));
                     }}
                     className="flex min-h-11 w-full items-start gap-2 rounded-md px-2 py-2 text-left hover:bg-accent"
                   >
@@ -262,7 +258,7 @@ function DetailBody({ eventId }: { eventId: string }) {
         )}
 
         <section className="mt-8 pb-6">
-          <h3 className="text-[0.6875rem] tracking-wide text-subtle">출처</h3>
+          <h3 className="text-xs tracking-wide text-subtle">출처</h3>
           {current.sources && current.sources.length > 0 ? (
             <ul className="mt-3 space-y-2">
               {current.sources.map((source) => (
@@ -320,7 +316,7 @@ function PeerRow({
           style={{ color: "var(--color-muted-foreground)" }}
         />
         <span className="min-w-0 flex-1 truncate text-sm">{title}</span>
-        <span className="shrink-0 font-serif text-[0.625rem] text-subtle">{label}</span>
+        <span className="shrink-0 font-serif text-xs text-subtle">{label}</span>
       </button>
     </li>
   );
@@ -338,26 +334,38 @@ function CompareColumn({
   onJump: () => void;
 }) {
   const snap = getYearSnapshot(year, { nearbyRange: 0, nearbyLimit: 0 });
+  const visual = visualForYear(year);
   return (
     <button
       type="button"
       onClick={onJump}
       className={cn(
-        "bg-popover px-2 py-3 text-left hover:bg-accent",
-        current && "bg-secondary",
+        "triptych-panel relative overflow-hidden bg-popover px-2 py-3 text-left hover:bg-accent",
+        current && "is-current bg-secondary",
       )}
     >
-      <p className="font-serif text-xs tabular-nums text-primary">{year}</p>
-      <p className="mt-0.5 text-[0.625rem] text-subtle">{caption}</p>
-      <ul className="mt-2 space-y-1.5">
+      {visual ? (
+        <span aria-hidden className="triptych-visual">
+          <img
+            src={visual.src}
+            alt=""
+            className="archive-photo h-full w-full object-cover"
+          />
+        </span>
+      ) : null}
+      <p className="relative font-serif text-xs tabular-nums text-primary">
+        {formatYearBare(year)}
+      </p>
+      <p className="relative mt-0.5 text-xs text-subtle">{caption}</p>
+      <ul className="relative mt-2 space-y-1.5">
         {REGIONS.map((id) => {
           const row = snap.regions.find((item) => item.region === id);
           return (
             <li key={id} className="min-w-0">
-              <p className="truncate text-[0.625rem] text-subtle">
+              <p className="truncate text-xs text-subtle">
                 {REGION_META[id].short}
               </p>
-              <p className="truncate text-[0.6875rem] leading-snug text-foreground">
+              <p className="truncate text-xs leading-snug text-foreground">
                 {row?.headline.title ?? "—"}
               </p>
             </li>

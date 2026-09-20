@@ -32,7 +32,7 @@ export function AppHeader() {
 
       <div className="ml-auto flex items-center gap-1 md:gap-2">
         <p
-          className="mr-1 hidden font-serif text-sm tabular-nums text-muted-foreground lg:block"
+          className="mr-1 hidden font-serif text-sm tabular-nums tracking-tight text-primary lg:block"
           aria-live="polite"
         >
           {formatYear(year)}

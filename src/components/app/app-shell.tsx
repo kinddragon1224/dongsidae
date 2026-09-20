@@ -9,6 +9,8 @@ import { NowStrip } from "@/components/timeline/now-strip";
 import { TimeControls } from "@/components/timeline/time-controls";
 import { TimelineView } from "@/components/timeline/timeline-view";
 import { YearInputDialog } from "@/components/timeline/year-input";
+import { GrainOverlay } from "@/components/visual/grain-overlay";
+import { TimeTransition } from "@/components/visual/time-transition";
 import { getEventById } from "@/lib/history/query";
 import { getZoom, useTimeline } from "@/lib/history/store";
 import { formatYear } from "@/lib/history/years";
@@ -33,32 +35,34 @@ export function AppShell() {
     if (selectedId && !selectedEvent) select(null);
   }, [selectedId, selectedEvent, select]);
 
-  if (!entered) {
-    return (
-      <>
-        <IntroScreen />
-        <YearInputDialog />
-        <SearchCommand />
-      </>
-    );
-  }
-
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
-      <AppHeader />
-      <NowStrip />
-      <div className="flex min-h-0 flex-1 md:hidden">
-        <MobileNow />
-      </div>
-      <div className="hidden min-h-0 flex-1 md:flex">
-        <TimelineView />
-      </div>
-      <TimeControls />
-      <EventDetail />
-      <SearchCommand />
-      <YearInputDialog />
-      <ExplainPanel />
-    </div>
+    <>
+      <GrainOverlay />
+      <TimeTransition />
+      {!entered ? (
+        <>
+          <IntroScreen />
+          <YearInputDialog />
+          <SearchCommand />
+        </>
+      ) : (
+        <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+          <AppHeader />
+          <NowStrip />
+          <div className="flex min-h-0 flex-1 md:hidden">
+            <MobileNow />
+          </div>
+          <div className="hidden min-h-0 flex-1 md:flex">
+            <TimelineView />
+          </div>
+          <TimeControls />
+          <EventDetail />
+          <SearchCommand />
+          <YearInputDialog />
+          <ExplainPanel />
+        </div>
+      )}
+    </>
   );
 }
 

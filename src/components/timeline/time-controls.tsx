@@ -7,6 +7,7 @@ import {
   sliderToYear,
   yearToSlider,
 } from "@/lib/history/years";
+import { jumpThroughTime } from "@/lib/visuals/jump";
 import { cn } from "@/lib/utils";
 
 const STEPS = [-100, -10, -1, 1, 10, 100] as const;
@@ -78,7 +79,7 @@ export function TimeControls() {
               <button
                 key={era.id}
                 type="button"
-                onClick={() => setYear(era.year)}
+                onClick={() => jumpThroughTime(era.year)}
                 title={era.hint}
                 className={cn(
                   "h-9 shrink-0 rounded-full px-2.5 text-[0.6875rem] tracking-wide",

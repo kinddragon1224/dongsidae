@@ -17,3 +17,11 @@ export function useMediaQuery(query: string) {
 export function usePrefersReducedMotion() {
   return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
+
+export function useIsMobile() {
+  return useMediaQuery("(max-width: 767px)");
+}
+
+export function useCanHover() {
+  return useMediaQuery("(hover: hover) and (pointer: fine)");
+}

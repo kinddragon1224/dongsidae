@@ -13,6 +13,7 @@ import {
   ticksAround,
 } from "@/lib/history/years";
 import { YEAR_MAX, YEAR_MIN } from "@/lib/history/catalog";
+import { visualForEvent } from "@/lib/visuals/registry";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 
@@ -112,9 +113,13 @@ export function TimelineView() {
     >
       <div
         aria-hidden
-        className="now-rule pointer-events-none absolute right-0 left-20 z-20 h-px"
+        className="now-band pointer-events-none absolute right-0 left-20 z-20"
         style={{ top: `${NOW * 100}%` }}
-      />
+      >
+        <div className="now-bloom" />
+        <div className="now-dust" />
+        <div className="now-rule" />
+      </div>
 
       <div
         className="absolute top-0 bottom-0 left-0 z-30 flex w-20 flex-col border-r border-border bg-background/80"
@@ -137,7 +142,7 @@ export function TimelineView() {
               >
                 <span
                   className={cn(
-                    "font-serif text-[0.625rem] tabular-nums",
+                    "font-serif text-xs tabular-nums",
                     major ? "text-muted-foreground" : "text-subtle",
                   )}
                 >
@@ -267,72 +272,64 @@ function RegionColumn({
       </header>
 
       <NowChip
+        key={year}
         title={chip.title}
         label={chip.label}
         token={meta.token}
         nowY={nowY}
+        eventId={chip.event?.id}
         active={chip.event?.id === selectedId}
         onClick={() => chip.event && onSelect(chip.event.id)}
       />
 
-      {placed.map((item) => (
-        <div
-          key={item.event.id}
-          className="absolute z-10"
-          style={{
-            top: item.y,
-            left: item.lane === 0 ? "0.5rem" : "48%",
-            right: item.lane === 0 ? "48%" : "0.5rem",
-            transform: "translateY(-50%)",
-            transition: reduced ? "none" : "top 250ms var(--ease-out)",
-          }}
-        >
-          {Math.abs(item.y - item.naturalY) > 3 && (
-            <span
-              aria-hidden
-              className="pointer-events-none absolute w-px bg-primary/35"
-              style={{
-                left: "-0.35rem",
-                top: item.naturalY < item.y ? `calc(50% - ${item.y - item.naturalY}px)` : "50%",
-                height: Math.abs(item.y - item.naturalY),
-              }}
-            />
-          )}
-          <YearAnchor naturalY={item.naturalY} cardY={item.y} />
-          <button
-            type="button"
-            onClick={() => onSelect(item.event.id)}
-            className={cn(
-              "w-full min-h-12 rounded-md border bg-card/95 px-2.5 py-2 text-left shadow-[var(--shadow-border)]",
-              "hover:shadow-[var(--shadow-border-hover)]",
-              item.event.id === selectedId || item.placeYear === year
-                ? "border-primary/35"
-                : "border-border",
-            )}
+      {placed.map((item) => {
+        const dist = Math.min(
+          1,
+          Math.abs(item.y - nowY) / Math.max(height * 0.42, 1),
+        );
+        const opacity = 1 - dist * 0.2;
+        const scale = reduced ? 1 : 1 - dist * 0.03;
+        return (
+          <div
+            key={item.event.id}
+            className="absolute z-10"
+            style={{
+              top: item.y,
+              left: item.lane === 0 ? "0.5rem" : "48%",
+              right: item.lane === 0 ? "48%" : "0.5rem",
+              transform: "translateY(-50%)",
+              transition: reduced ? "none" : "top 250ms var(--ease-out)",
+            }}
           >
-            <p className="truncate font-serif text-xs leading-snug text-foreground md:text-sm">
-              {item.event.title}
-            </p>
-            <p className="mt-0.5 truncate text-xs text-subtle">
-              {item.event.approximate ? "약 " : ""}
-              {item.event.startYear < 0
-                ? `전${Math.abs(item.event.startYear)}`
-                : item.event.startYear}
-              {item.event.endYear != null &&
-              item.event.endYear !== item.event.startYear
-                ? `–${item.event.endYear < 0 ? Math.abs(item.event.endYear) : item.event.endYear}`
-                : ""}
-              {item.cluster.length > 0 ? `  · +${item.cluster.length}` : ""}
-            </p>
-          </button>
-          {item.cluster.length > 0 && (
-            <ClusterList
-              events={item.cluster.map((row) => row.event)}
+            {Math.abs(item.y - item.naturalY) > 3 && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute w-px bg-primary/35"
+                style={{
+                  left: "-0.35rem",
+                  top: item.naturalY < item.y ? `calc(50% - ${item.y - item.naturalY}px)` : "50%",
+                  height: Math.abs(item.y - item.naturalY),
+                }}
+              />
+            )}
+            <YearAnchor naturalY={item.naturalY} cardY={item.y} />
+            <TimelineCard
+              event={item.event}
+              selected={item.event.id === selectedId}
+              extra={item.cluster.length > 0 ? `  · +${item.cluster.length}` : ""}
+              opacity={opacity}
+              scale={scale}
               onSelect={onSelect}
             />
-          )}
-        </div>
-      ))}
+            {item.cluster.length > 0 && (
+              <ClusterList
+                events={item.cluster.map((row) => row.event)}
+                onSelect={onSelect}
+              />
+            )}
+          </div>
+        );
+      })}
 
       {placed.length === 0 && !chip.event && fallback && (
         <button
@@ -344,11 +341,68 @@ function RegionColumn({
           className="absolute right-2 left-2 z-10 rounded-md border border-border bg-card/95 px-2.5 py-3 text-left"
           style={{ top: nowY + 28 }}
         >
-          <p className="text-[0.625rem] tracking-wide text-subtle">가까운 기록</p>
+          <p className="text-xs tracking-wide text-subtle">가까운 기록</p>
           <p className="mt-1 font-serif text-sm text-foreground">{fallback.title}</p>
         </button>
       )}
     </section>
+  );
+}
+
+function TimelineCard({
+  event,
+  selected,
+  extra,
+  opacity,
+  scale,
+  onSelect,
+}: {
+  event: HistoryEvent;
+  selected: boolean;
+  extra: string;
+  opacity: number;
+  scale: number;
+  onSelect: (id: string) => void;
+}) {
+  const visual = visualForEvent(event.id);
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(event.id)}
+      className={cn(
+        "timeline-card relative w-full min-h-12 overflow-hidden rounded-md border bg-card/95 px-2.5 py-2 text-left shadow-[var(--shadow-border)]",
+        "hover:shadow-[var(--shadow-border-hover)]",
+        selected ? "is-selected border-primary/35" : "border-border",
+      )}
+      style={{
+        opacity,
+        transform: `scale(${scale})`,
+      }}
+    >
+      {visual ? (
+        <span aria-hidden className="card-preview">
+          <img
+            src={visual.src}
+            alt=""
+            className="archive-photo"
+          />
+        </span>
+      ) : null}
+      <p className="relative truncate font-serif text-xs leading-snug text-foreground md:text-sm">
+        {event.title}
+      </p>
+      <p className="relative mt-0.5 truncate text-xs text-subtle">
+        {event.approximate ? "약 " : ""}
+        {event.startYear < 0
+          ? `전${Math.abs(event.startYear)}`
+          : event.startYear}
+        {event.endYear != null &&
+        event.endYear !== event.startYear
+          ? `–${event.endYear < 0 ? Math.abs(event.endYear) : event.endYear}`
+          : ""}
+        {extra}
+      </p>
+    </button>
   );
 }
 
@@ -357,6 +411,7 @@ function NowChip({
   label,
   token,
   nowY,
+  eventId,
   active,
   onClick,
 }: {
@@ -364,27 +419,34 @@ function NowChip({
   label: string;
   token: string;
   nowY: number;
+  eventId?: string;
   active: boolean;
   onClick: () => void;
 }) {
+  const visual = eventId ? visualForEvent(eventId) : undefined;
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "absolute right-2 left-2 z-20 flex min-h-10 items-center gap-2 rounded-md border px-2.5 py-1.5 text-left",
+        "now-chip now-pass absolute right-2 left-2 z-20 flex min-h-10 items-center gap-2 rounded-md border px-2.5 py-1.5 text-left",
         "bg-background/90 shadow-[var(--shadow-border)]",
         active ? "border-primary/45" : "border-primary/25",
       )}
       style={{ top: nowY, transform: "translateY(-50%)" }}
     >
-      <span className="size-1.5 shrink-0 rounded-full" style={{ background: token }} />
-      <span className="min-w-0 flex-1">
+      {visual ? (
+        <span aria-hidden className="now-chip-visual">
+          <img src={visual.src} alt="" className="archive-photo" />
+        </span>
+      ) : null}
+      <span className="relative size-1.5 shrink-0 rounded-full" style={{ background: token }} />
+      <span className="relative min-w-0 flex-1">
         <span className="block truncate font-serif text-xs text-foreground md:text-sm">
           {title}
         </span>
         {label ? (
-          <span className="block text-[0.625rem] tracking-wide text-subtle">{label}</span>
+          <span className="block text-xs tracking-wide text-subtle">{label}</span>
         ) : null}
       </span>
     </button>
@@ -416,7 +478,7 @@ function ClusterList({
           <button
             type="button"
             onClick={() => onSelect(event.id)}
-            className="w-full truncate rounded px-1 py-1 text-left text-[0.625rem] text-subtle hover:text-foreground"
+            className="w-full truncate rounded px-1 py-1 text-left text-xs text-subtle hover:text-foreground"
           >
             {event.title}
           </button>

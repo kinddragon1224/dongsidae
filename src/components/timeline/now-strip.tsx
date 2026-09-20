@@ -10,7 +10,7 @@ export function NowStrip() {
   const rows = yearSnapshot(year, 1).filter((row) => regions[row.region]);
 
   return (
-    <div className="hidden border-b border-border md:block">
+    <div className="now-strip hidden border-b border-border md:block">
       <div
         className="grid"
         style={{ gridTemplateColumns: `repeat(${Math.max(rows.length, 1)}, minmax(0, 1fr))` }}
