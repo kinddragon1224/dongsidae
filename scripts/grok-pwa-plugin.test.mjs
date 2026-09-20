@@ -461,7 +461,7 @@ test("rejects hosts that are not plain slugs", () => {
 
 test("renders install page markup", () => {
   const html = renderInstallPage("wild-race.grok.me", "/?install=1&platform=ios");
-  assert.match(html, /Add Wild Race to your/);
+  assert.match(html, /Add 동시대 to your/);
   assert.match(html, /\/__grok\/install\/styles\.css/);
   assert.match(html, /href="\/"/);
   assert.equal(html.includes("{{APP_NAME}}"), false);
@@ -477,7 +477,16 @@ test("renders the manifest with the per-app name", () => {
   const manifest = JSON.parse(renderWebManifest("wild-race.grok.me"));
   assert.equal(manifest.name, "동시대");
   assert.equal(manifest.short_name, "동시대");
+  assert.equal(manifest.lang, "ko");
+  assert.equal(manifest.theme_color, "#0c0b09");
   assert.equal(manifest.icons[0].src, "/__grok/icon-180.png");
+});
+
+test("Chrome install on Vercel does not fall back to Grok App", () => {
+  const manifest = JSON.parse(renderWebManifest("dongsidae.vercel.app"));
+  assert.equal(manifest.name, "동시대");
+  assert.equal(manifest.short_name, "동시대");
+  assert.notEqual(manifest.name, "Grok App");
 });
 
 // Tripwires: the deployed-app path only works if Nitro scans server/ — an

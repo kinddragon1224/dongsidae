@@ -151,39 +151,41 @@ export function stripInstallParams(url) {
   return rest ? `${path}?${rest}` : path;
 }
 
-export function renderInstallPageHtml(template, { host, url } = {}) {
+export function renderInstallPageHtml(template, { host, url, site } = {}) {
+  const name = resolveOgTitle(site ?? readOgSite(), DEFAULT_APP_NAME, host);
   return String(template)
-    .replaceAll("{{APP_NAME}}", escapeHtml(appNameFromHost(host)))
+    .replaceAll("{{APP_NAME}}", escapeHtml(name))
     .replaceAll("{{APP_URL}}", escapeHtml(stripInstallParams(url)));
 }
 
-export function renderWebManifest(hostHeader) {
-  const site = readOgSite();
-  const name = String(site.title ?? "").trim() || appNameFromHost(hostHeader);
-  const description = String(site.description ?? "").trim();
-  return JSON.stringify(
-    {
-      name,
-      short_name: name,
-      description: description || undefined,
-      id: "/",
-      start_url: "/",
-      scope: "/",
-      display: "standalone",
-      background_color: "#0c0b09",
-      theme_color: "#0c0b09",
-      lang: "ko",
-      icons: [
-        {
-          src: "/__grok/icon-180.png",
-          sizes: "180x180",
-          type: "image/png",
-        },
-      ],
-    },
-    null,
-    2,
-  );
+export function renderWebManifest(hostHeader, site) {
+  const resolved = site ?? readOgSite();
+  const name = resolveOgTitle(resolved, DEFAULT_APP_NAME, hostHeader);
+  const hex = placeholderCardColor(resolved);
+  const theme = hex ? `#${hex}` : "#000000";
+  const description = String(resolved.description ?? "").trim();
+  const lang = String(resolved.lang ?? "").trim();
+  /** @type {Record<string, unknown>} */
+  const manifest = {
+    name,
+    short_name: name,
+    id: "/",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    background_color: theme,
+    theme_color: theme,
+    icons: [
+      {
+        src: "/__grok/icon-180.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  };
+  if (description) manifest.description = description;
+  if (lang) manifest.lang = lang;
+  return JSON.stringify(manifest, null, 2);
 }
 
 export function grokPwaHeadTags(appName = DEFAULT_APP_NAME) {
