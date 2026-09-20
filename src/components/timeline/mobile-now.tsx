@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { ERA_SHORTCUTS } from "@/lib/history/constants";
-import { yearHeadline } from "@/lib/history/query";
 import { getRegionSnapshot } from "@/lib/history/snapshot";
 import { REGION_META } from "@/lib/history/regions";
 import { useTimeline, useZoom } from "@/lib/history/store";
@@ -8,9 +7,9 @@ import type { Region } from "@/lib/history/types";
 import { REGIONS } from "@/lib/history/types";
 import { formatYearBare } from "@/lib/history/years";
 import { jumpThroughTime } from "@/lib/visuals/jump";
-import { visualForYear } from "@/lib/visuals/registry";
 import { cn } from "@/lib/utils";
 import { EventCard } from "./event-card";
+import { TimeSlice } from "./time-slice";
 
 /** Sparse decades still show the nearest sourced event in each column. */
 const MOBILE_NEARBY = 80;
@@ -26,12 +25,10 @@ export function MobileNow() {
     () => shift(-zoom.step),
     () => shift(zoom.step),
   );
-  const headline = yearHeadline(year);
-  const wash = visualForYear(year);
 
   return (
     <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden">
-      <div className="shrink-0 border-b border-border px-4 pt-2.5 pb-3">
+      <div className="shrink-0 border-b border-border">
         <button
           type="button"
           onClick={() => {
@@ -42,18 +39,9 @@ export function MobileNow() {
           onPointerMove={swipe.onPointerMove}
           onPointerUp={swipe.onPointerUp}
           onPointerCancel={swipe.onPointerUp}
-          className="relative flex w-full min-w-0 min-h-14 touch-manipulation flex-col items-start justify-center overflow-hidden text-left"
+          className="relative flex w-full min-w-0 min-h-14 touch-manipulation flex-col items-start justify-center overflow-hidden px-4 pt-2.5 pb-1 text-left"
           aria-label="연도 입력. 좌우로 밀면 연도가 바뀝니다."
         >
-          {wash ? (
-            <span aria-hidden className="year-wash">
-              <img
-                src={wash.src}
-                alt=""
-                className="archive-photo h-full w-full object-cover"
-              />
-            </span>
-          ) : null}
           <span className="relative text-xs tracking-[0.22em] text-subtle">지금</span>
           <span
             key={year}
@@ -61,22 +49,8 @@ export function MobileNow() {
           >
             {formatYearBare(year)}
           </span>
-          <span className="relative mt-1.5 block w-full truncate text-sm text-muted-foreground">
-            {headline}
-          </span>
         </button>
-
-        <ul className="mt-3 grid w-full grid-cols-2 gap-2">
-          {REGIONS.map((id) => (
-            <li key={id} className="min-w-0">
-              <SnapshotTile
-                region={id}
-                year={year}
-                onOpen={(eventId) => select(eventId)}
-              />
-            </li>
-          ))}
-        </ul>
+        <TimeSlice layout="mobile" />
       </div>
 
       <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-3 pb-4">
@@ -112,48 +86,6 @@ export function MobileNow() {
   );
 }
 
-function SnapshotTile({
-  region,
-  year,
-  onOpen,
-}: {
-  region: Region;
-  year: number;
-  onOpen: (id: string) => void;
-}) {
-  const row = getRegionSnapshot(region, year, {
-    nearbyRange: MOBILE_NEARBY,
-    nearbyLimit: 1,
-  });
-  const meta = REGION_META[region];
-  const eventId = row.headline.event?.id;
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        if (eventId) onOpen(eventId);
-      }}
-      disabled={!eventId}
-      className="flex min-h-14 w-full min-w-0 touch-manipulation items-start gap-2 overflow-hidden rounded-lg border border-border bg-card px-2.5 py-2 text-left active:bg-accent disabled:active:bg-card"
-    >
-      <span
-        className="mt-1.5 size-1.5 shrink-0 rounded-full"
-        style={{ background: meta.token }}
-      />
-      <span className="min-w-0 flex-1 overflow-hidden">
-        <span className="block truncate text-xs tracking-wide text-subtle">
-          {meta.short}
-          {row.headline.label ? ` · ${row.headline.label}` : ""}
-        </span>
-        <span className="mt-0.5 block truncate text-sm text-foreground">
-          {row.headline.title}
-        </span>
-      </span>
-    </button>
-  );
-}
-
 function RegionNowList({
   region,
   year,
@@ -179,17 +111,15 @@ function RegionNowList({
   if (nowEvents.length === 0 && nearby.length === 0) return null;
 
   return (
-    <section className="mb-5 min-w-0">
-      <div className="mb-2 flex min-w-0 items-baseline gap-2">
+    <section className="mb-5">
+      <div className="mb-2 flex items-baseline gap-2">
         <span
           className="size-1.5 shrink-0 rounded-full"
           style={{ background: meta.token }}
         />
-        <h2 className="min-w-0 truncate font-serif text-sm text-foreground">
-          {meta.label}
-        </h2>
+        <h2 className="font-serif text-sm text-foreground">{meta.label}</h2>
       </div>
-      <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {nowEvents.map((item) => (
           <EventCard
             key={item.event.id}

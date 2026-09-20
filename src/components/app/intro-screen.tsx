@@ -43,8 +43,7 @@ export function IntroScreen() {
           </div>
 
           <p className="mx-auto mt-2 max-w-md text-center text-sm leading-relaxed text-subtle">
-            한 해를 움직이면, 기독교사와 한반도, 동아시아와 세계가 함께 움직입니다.
-            고리를 굴리거나 아래 문을 여십시오.
+            한 해를 고르면, 네 세계가 동시에 열린다.
           </p>
 
           <ul className="relative z-10 mt-5 grid w-full min-w-0 grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-4">

@@ -163,8 +163,9 @@ export function TimelineView() {
           >
             <span
               key={year}
-              className="year-swap font-serif text-xl font-medium tracking-tight text-primary tabular-nums"
+              className="year-swap relative font-serif text-xl font-medium tracking-tight text-primary tabular-nums"
             >
+              <span aria-hidden className="now-orbit" />
               {formatYearBare(year)}
             </span>
           </div>

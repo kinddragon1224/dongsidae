@@ -470,6 +470,112 @@
   );
 }
 
+.time-slice {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-now) 5%, transparent),
+    transparent 72%
+  );
+}
+
+.slice-era-wash {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+}
+
+.slice-strip {
+  isolation: isolate;
+}
+
+.slice-cell {
+  min-width: 0;
+  mask-image: linear-gradient(to right, transparent 0%, black 12%, black 100%);
+}
+
+.slice-cell:first-child {
+  mask-image: none;
+}
+
+.slice-cell .archive-photo {
+  filter: saturate(0.58) contrast(1.08) brightness(0.92);
+}
+
+.slice-cell-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgb(12 11 9 / 0.62) 0%,
+    rgb(12 11 9 / 0.08) 46%,
+    transparent 72%
+  );
+}
+
+.slice-now-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-now) 55%, transparent) 8%,
+    color-mix(in oklab, var(--color-now) 95%, transparent) 50%,
+    color-mix(in oklab, var(--color-now) 55%, transparent) 92%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px color-mix(in oklab, var(--color-now) 22%, transparent);
+}
+
+.now-orbit {
+  position: absolute;
+  inset: -0.35rem -0.55rem;
+  border: 1px solid color-mix(in oklab, var(--color-now) 38%, transparent);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.era-wash-antiquity {
+  background:
+    radial-gradient(
+      ellipse at 18% 0%,
+      color-mix(in oklab, var(--color-primary) 7%, transparent),
+      transparent 52%
+    ),
+    var(--color-background);
+}
+
+.era-wash-medieval {
+  background:
+    radial-gradient(
+      ellipse at 80% 10%,
+      color-mix(in oklab, var(--color-primary) 6%, transparent),
+      transparent 48%
+    ),
+    var(--color-background);
+}
+
+.era-wash-early-modern {
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in oklab, var(--color-now) 6%, transparent),
+      transparent 46%
+    ),
+    var(--color-background);
+}
+
+.era-wash-modern {
+  background:
+    radial-gradient(
+      ellipse at 12% 100%,
+      color-mix(in oklab, var(--color-region-world) 8%, transparent),
+      transparent 50%
+    ),
+    var(--color-background);
+}
+
 .triptych {
   perspective: 56rem;
 }

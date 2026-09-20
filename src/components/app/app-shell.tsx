@@ -5,7 +5,7 @@ import { ExplainPanel } from "@/components/explain/explain-panel";
 import { SearchCommand } from "@/components/search/search-command";
 import { EventDetail } from "@/components/timeline/event-detail";
 import { MobileNow } from "@/components/timeline/mobile-now";
-import { NowStrip } from "@/components/timeline/now-strip";
+import { TimeSlice } from "@/components/timeline/time-slice";
 import { TimeControls } from "@/components/timeline/time-controls";
 import { TimelineView } from "@/components/timeline/timeline-view";
 import { YearInputDialog } from "@/components/timeline/year-input";
@@ -48,7 +48,7 @@ export function AppShell() {
       ) : (
         <div className="flex h-dvh min-w-0 flex-col overflow-hidden bg-background text-foreground">
           <AppHeader />
-          <NowStrip />
+          <TimeSlice layout="desktop" />
           <div className="flex min-h-0 min-w-0 flex-1 overflow-x-hidden md:hidden">
             <MobileNow />
           </div>

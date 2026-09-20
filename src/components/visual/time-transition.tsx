@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { formatYearBare } from "@/lib/history/years";
+import { formatYearBare, signedYearDistance, yearsBetween } from "@/lib/history/years";
 import { useYearReveal } from "@/lib/visuals/transition-store";
 import { visualForYear } from "@/lib/visuals/registry";
 
@@ -15,6 +15,12 @@ export function TimeTransition() {
 
   if (!reveal?.active) return null;
   const visual = visualForYear(reveal.to);
+  const gap = yearsBetween(reveal.from, reveal.to);
+  const later = signedYearDistance(reveal.from, reveal.to) > 0;
+  const distance =
+    gap === 0
+      ? "같은 해"
+      : `${gap.toLocaleString("ko-KR")}년 ${later ? "후" : "전"}`;
 
   return (
     <div
@@ -37,6 +43,9 @@ export function TimeTransition() {
       <div className="relative text-center">
         <p className="font-serif text-sm tabular-nums text-subtle">
           {formatYearBare(reveal.from)}
+        </p>
+        <p className="mt-1 font-serif text-sm tabular-nums tracking-wide text-muted-foreground">
+          {distance}
         </p>
         <p className="mt-2 font-serif text-year tabular-nums tracking-tight text-primary">
           {formatYearBare(reveal.to)}
