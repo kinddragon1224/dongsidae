@@ -6,6 +6,12 @@
 
 연도를 움직이면 네 세계가 함께 움직입니다. 종교개혁 때 조선에서 무슨 일이 있었는지, 니케아 공의회 때 고구려가 어디 있었는지를 한 화면에서 직관적으로 보게 하는 것이 목적입니다.
 
+## 라이브
+
+- 앱: [dongsidae.vercel.app](https://dongsidae.vercel.app)
+- 코드: [github.com/kinddragon1224/dongsidae](https://github.com/kinddragon1224/dongsidae)
+- 대표 연도: [325](https://dongsidae.vercel.app/?y=325) · [1517](https://dongsidae.vercel.app/?y=1517) · [1885](https://dongsidae.vercel.app/?y=1885) · [1945](https://dongsidae.vercel.app/?y=1945)
+
 ## 실행
 
 ```bash
