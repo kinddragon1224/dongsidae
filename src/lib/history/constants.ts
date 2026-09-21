@@ -1,6 +1,6 @@
 import type { EraShortcut, ZoomLevel } from "./types";
 
-export const DEFAULT_YEAR = 1517;
+export const DEFAULT_YEAR = 1945;
 
 export const ZOOM_LEVELS: ZoomLevel[] = [
   { id: "year", label: "1년", step: 1, halfWindow: 14, tick: 1, maxCards: 10 },
@@ -43,7 +43,7 @@ export const ERA_SHORTCUTS: EraShortcut[] = [
   { id: "opening", label: "개항기", year: 1876, hint: "강화도 조약" },
   { id: "mission", label: "한국 선교", year: 1885, hint: "개신교 선교의 시작" },
   { id: "occupation", label: "일제강점기", year: 1910, hint: "국권 피탈" },
-  { id: "liberation", label: "광복", year: 1945, hint: "해방과 세계대전 종전" },
+  { id: "liberation", label: "광복", year: 1945, hint: "해방 · 유엔 · 세계 평화의 날" },
   { id: "modern", label: "현대", year: 1987, hint: "민주화" },
   { id: "nowish", label: "탈냉전", year: 1991, hint: "소련 해체" },
 ];
