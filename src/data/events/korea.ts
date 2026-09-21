@@ -1,1 +1,1 @@
-LOAD_FROM_DISK_/workspace/dongsidae/src/data/events/korea.ts
+LOAD_PLACEHOLDER_WILL_REPLACE
