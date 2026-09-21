@@ -1,1 +1,1 @@
-PLACEHOLDER_KOREA
+LOAD_FROM_DISK_/workspace/dongsidae/src/data/events/korea.ts
