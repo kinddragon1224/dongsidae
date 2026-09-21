@@ -44,7 +44,7 @@ export const worldEvents = defineEvents("world", [
     kind: "event",
     significance: 5,
     categories: ["로마"],
-    summary: "오도아케르가 로물루스 아우구스툴루스를 폐위. 서로마 제정의 상징적 종료.",
+    summary: "오도아케르가 로물루스 아우구스투스를 폐위. 서로마 제정의 상징적 종료.",
     yearNote: "동로마는 지속되었다. ‘멸망 연도’로서 476년은 후대 역사 서술의 관례다.",
     tags: ["서로마", "476"],
     sources: [S.britannica("Fall of the Western Roman Empire")],
