@@ -86,7 +86,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
     kind: "event",
     significance: 3,
     categories: ["동진"],
-    summary: "동진 명제(사마소)가 죽고 성제가 즉위했다. 화북에서는 후조의 석륵이 세력을 확장하던 해.",
+    summary: "동진 명제(사마소)가 죽고 성제가 즉위했다. 화북에서는 후조의 석륵이 세력을 확장하던 해. 로마가 교리 합의를 시도하던 해, 동아시아는 남북으로 갈라져 있었다.",
     people: ["사마소", "석륵"],
     tags: ["동진", "후조"],
     relatedEventIds: ["nicaea-325", "eastern-jin"],
