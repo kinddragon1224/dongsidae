@@ -79,8 +79,11 @@ export const koreaEvents = defineEvents("korea", [
     significance: 3,
     categories: ["고구려", "왕"],
     summary: "낙랑·대방 방면을 공략하며 고구려의 한반도 북부 지위를 굳힌 왕.",
+    description:
+      "재위 약 300–331. 313년 전후 낙랑·대방 방면 공략으로 한대 군현 체제가 사실상 끝났다. 니케아(325) 무렵 한반도는 삼국시대였고, 불교 전래(372년경 전승)와 그리스도교 기록은 아직 없다.",
     people: ["미천왕"],
     tags: ["미천왕", "고구려"],
+    relatedEventIds: ["lelang-313", "nicaea-325"],
   },
   {
     id: "buddhism-goguryeo",
