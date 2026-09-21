@@ -1,1 +1,1 @@
-PLACEHOLDER_WORLD
+@/workspace/dongsidae/src/data/events/world.ts
