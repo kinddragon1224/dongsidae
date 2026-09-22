@@ -1,6 +1,6 @@
 import type { EraShortcut, ZoomLevel } from "./types";
 
-export const DEFAULT_YEAR = 325;
+export const DEFAULT_YEAR = 1517;
 
 export const ZOOM_LEVELS: ZoomLevel[] = [
   { id: "year", label: "1년", step: 1, halfWindow: 14, tick: 1, maxCards: 10 },
@@ -38,7 +38,7 @@ export const ERA_SHORTCUTS: EraShortcut[] = [
   { id: "medieval", label: "중세", year: 800, hint: "카롤링거와 통일신라" },
   { id: "schism", label: "동서 분열", year: 1054, hint: "교회 분열 · 고려" },
   { id: "joseon", label: "조선", year: 1392, hint: "이성계의 개국" },
-  { id: "reformation", label: "종교개혁", year: 1517, hint: "루터 · 중종 · 명" },
+  { id: "reformation", label: "종교개혁", year: 1517, hint: "95개조 · 중종 · 정덕" },
   { id: "imjin", label: "임진왜란", year: 1592, hint: "동아시아 전쟁" },
   { id: "opening", label: "개항기", year: 1876, hint: "강화도 조약" },
   { id: "mission", label: "한국 선교", year: 1885, hint: "개신교 선교의 시작" },
@@ -52,12 +52,12 @@ export const QUICK_START = [
   {
     year: 325,
     title: "니케아",
-    line: "부활절 날짜를 맞추려 모일 때, 한반도는 삼국시대였다. (오늘 모닝)",
+    line: "부활절 날짜를 맞추려 모일 때, 한반도는 삼국시대였다.",
   },
   {
     year: 1517,
     title: "종교개혁",
-    line: "루터가 문을 두드릴 때, 조선은 중종 연간이었다.",
+    line: "루터가 논제를 낼 때, 조선은 중종 연간이었다. (오늘 모닝)",
   },
   {
     year: 1885,
