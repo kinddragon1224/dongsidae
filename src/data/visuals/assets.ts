@@ -265,7 +265,7 @@ export const PORTALS: PortalSpec[] = [
     year: 1517,
     title: "종교개혁",
     archiveLabel: "REFORMATIO",
-    line: "루터가 문을 두드릴 때, 조선은 중종 연간이었다.",
+    line: "루터가 논제를 낼 때, 조선은 중종 연간이었다. (오늘 모닝)",
     visualId: "luther-theses",
   },
   {
