@@ -1,4 +1,4 @@
-import { S, defineEvents } from "./schema.ts";
+import { S, defineEvents } from "../schema.ts";
 
 export const batch1Christianity = defineEvents("christianity", [
   {
