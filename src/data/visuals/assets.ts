@@ -272,7 +272,7 @@ export const PORTALS: PortalSpec[] = [
     year: 1885,
     title: "선교",
     archiveLabel: "JEMULPO",
-    line: "언더우드와 아펜젤러가 제물포에 내리던 해.",
+    line: "제물포 상륙과 톈진조약이 같은 해에 겹쳤다.",
     visualId: "chemulpo-map",
   },
   {
