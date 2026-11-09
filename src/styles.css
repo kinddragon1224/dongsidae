@@ -97,6 +97,7 @@
 }
 
 :root {
+  color-scheme: dark; /* 네이티브 스크롤바·폼 컨트롤을 어두운 테마로 */
   --now-offset: 42%;
   --motion-micro: 80ms;
   --motion-quick: 150ms;

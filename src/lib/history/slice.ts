@@ -147,7 +147,9 @@ export function buildTimeSliceSentence(regions: TimeSliceRegion[]): string {
 
   if (companions.length === 0) return `${leadClause(lead)}.`;
   if (companions.length === 1) return `${leadClause(lead)}, ${companions[0]}.`;
-  return `${leadClause(lead)}, ${companions[0]} 그리고 ${companions[1]}.`;
+  // "…있었습니다 그리고 …" 대신 연결형: "…있었고, …있었습니다."
+  const joined = companions[0].replace(/습니다$/, "고");
+  return `${leadClause(lead)}, ${joined}, ${companions[1]}.`;
 }
 
 export function buildTimeSlice(year: number): TimeSlice {

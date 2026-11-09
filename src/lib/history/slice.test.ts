@@ -85,6 +85,14 @@ describe("time slice", () => {
     assert.equal(pickLead(slice.regions)?.presence, "exact");
   });
 
+  it("joins two companions with a connective, not a bare 그리고", () => {
+    for (const year of [325, 1517, 1885, 1945]) {
+      const { sentence } = buildTimeSlice(year);
+      assert.doesNotMatch(sentence, /습니다 그리고/);
+      assert.equal(sentence.match(/습니다/g)?.length ?? 0, sentence.includes("에서는") ? 1 : 0);
+    }
+  });
+
   it("uses Korean batchim for particles", () => {
     assert.equal(hasBatchim("중종"), true);
     assert.equal(hasBatchim("논제"), false);
