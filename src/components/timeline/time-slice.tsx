@@ -61,7 +61,7 @@ export function TimeSlice({ layout }: Props) {
         </span>
       ) : null}
 
-      <div className="relative px-4 pt-2.5 md:px-6">
+      <div className={cn("relative px-4 pt-2.5 md:px-6", layout === "desktop" && "pb-3")}>
         <div className="flex items-center gap-2">
           <SliceOrbit />
           <p className="text-xs tracking-[0.22em] text-subtle">이 시간의 세계</p>
@@ -74,6 +74,8 @@ export function TimeSlice({ layout }: Props) {
         </p>
       </div>
 
+      {/* 데스크톱은 시간축의 '지금' 줄 카드가 같은 정보를 보여주므로 띠를 생략 */}
+      {layout === "mobile" && (
       <div
         className={cn(
           "relative mt-2.5 min-w-0",
@@ -95,6 +97,7 @@ export function TimeSlice({ layout }: Props) {
         </div>
         <div aria-hidden className="slice-now-line" />
       </div>
+      )}
     </section>
   );
 }
@@ -119,10 +122,7 @@ function SliceCell({
         if (row.eventId) onOpen(row.eventId);
       }}
       className="slice-cell relative min-h-16 min-w-0 flex-1 overflow-hidden text-left md:min-h-20"
-      style={{
-        marginLeft: index === 0 ? 0 : "-1rem",
-        zIndex: REGIONS.length - index,
-      }}
+      style={{ zIndex: REGIONS.length - index }}
       aria-label={`${meta.label} ${row.title}`}
     >
       {visual ? (
