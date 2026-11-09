@@ -98,5 +98,12 @@ describe("time slice", () => {
     assert.equal(hasBatchim("논제"), false);
     assert.equal(iGa("중종"), "이");
     assert.equal(iGa("논제"), "가");
+    assert.equal(iGa("고구려 건국 (전통 연대)"), "이");
+  });
+
+  it("uses shortTitle in the sentence, without comma-split titles", () => {
+    const { sentence } = buildTimeSlice(1885);
+    assert.match(sentence, /언더우드·아펜젤러의 제물포 도착이 있던 해/);
+    assert.doesNotMatch(sentence, /톈진조약과 조선/);
   });
 });

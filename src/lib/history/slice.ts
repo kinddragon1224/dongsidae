@@ -44,7 +44,8 @@ export function presenceFromHeadline(row: YearRegionSnapshot): SlicePresence {
 }
 
 export function hasBatchim(word: string): boolean {
-  const chars = [...word].reverse();
+  // "고구려 건국 (전통 연대)" → 조사는 괄호 앞 낱말에 붙는다
+  const chars = [...word.replace(/\s*\([^)]*\)\s*$/, "")].reverse();
   const hangul = chars.find((ch) => {
     const code = ch.charCodeAt(0);
     return code >= 0xac00 && code <= 0xd7a3;
@@ -73,7 +74,7 @@ function toSliceRegion(row: YearRegionSnapshot): TimeSliceRegion {
   );
   return {
     region: row.region,
-    title: row.headline.title,
+    title: event?.shortTitle ?? row.headline.title,
     label: row.headline.label,
     presence,
     eventId: event?.id,

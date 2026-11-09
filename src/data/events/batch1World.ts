@@ -4,6 +4,7 @@ export const batch1World = defineEvents("world", [
   {
     id: "imjin-world-1592",
     title: "동아시아 대전, 세계와 나란히",
+    shortTitle: "유럽의 종교전쟁과 대항해",
     startYear: 1592,
     kind: "event",
     significance: 3,
@@ -38,6 +39,7 @@ export const batch1World = defineEvents("world", [
   {
     id: "japan-empire-1910",
     title: "제국의 시대, 한국 병합",
+    shortTitle: "제국주의 시대",
     startYear: 1910,
     kind: "event",
     significance: 4,

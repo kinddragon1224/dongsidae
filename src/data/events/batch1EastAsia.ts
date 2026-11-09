@@ -4,6 +4,7 @@ export const batch1EastAsia = defineEvents("east_asia", [
   {
     id: "bunroku-1592",
     title: "분로쿠의 역 (임진왜란)",
+    shortTitle: "분로쿠의 역",
     startYear: 1592,
     endYear: 1598,
     kind: "war",
@@ -39,6 +40,7 @@ export const batch1EastAsia = defineEvents("east_asia", [
   {
     id: "tianjin-convention-1885",
     title: "톈진조약 (이토·이홍장)",
+    shortTitle: "톈진조약",
     startYear: 1885,
     kind: "event",
     significance: 4,
@@ -61,6 +63,7 @@ export const batch1EastAsia = defineEvents("east_asia", [
   {
     id: "korea-annexation-ea-1910",
     title: "일본, 한국 병합",
+    shortTitle: "일본의 한국 병합",
     startYear: 1910,
     kind: "event",
     significance: 5,

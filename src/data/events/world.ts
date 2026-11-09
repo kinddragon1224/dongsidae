@@ -52,6 +52,7 @@ export const worldEvents = defineEvents("world", [
   {
     id: "hijra",
     title: "히즈라 — 이슬람의 시작",
+    shortTitle: "히즈라",
     startYear: 622,
     kind: "event",
     significance: 5,
@@ -175,6 +176,7 @@ export const worldEvents = defineEvents("world", [
   {
     id: "selim-egypt",
     title: "오스만, 맘루크 이집트 정복",
+    shortTitle: "오스만의 맘루크 이집트 정복",
     startYear: 1517,
     kind: "event",
     significance: 5,
@@ -218,6 +220,7 @@ export const worldEvents = defineEvents("world", [
   {
     id: "copernicus",
     title: "코페르니쿠스 『천구의 회전에 관하여』",
+    shortTitle: "『천구의 회전에 관하여』 출판",
     startYear: 1543,
     kind: "work",
     significance: 4,

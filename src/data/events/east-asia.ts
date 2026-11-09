@@ -288,6 +288,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   {
     id: "qing-entry",
     title: "청, 베이징 입성",
+    shortTitle: "청의 베이징 입성",
     startYear: 1644,
     kind: "event",
     significance: 4,
@@ -373,6 +374,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   {
     id: "northern-wei-439",
     title: "북위, 화북 통일",
+    shortTitle: "북위의 화북 통일",
     startYear: 439,
     kind: "event",
     significance: 3,
@@ -406,6 +408,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   {
     id: "mongol-japan-1274",
     title: "여몽연합군, 일본 원정",
+    shortTitle: "여몽연합군의 일본 원정",
     startYear: 1274,
     endYear: 1281,
     kind: "war",
@@ -419,6 +422,7 @@ export const eastAsiaEvents = defineEvents("east_asia", [
   {
     id: "toyotomi-1590",
     title: "도요토미, 일본 통일",
+    shortTitle: "도요토미의 일본 통일",
     startYear: 1590,
     kind: "event",
     significance: 4,

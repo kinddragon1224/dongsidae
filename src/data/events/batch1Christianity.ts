@@ -55,6 +55,7 @@ export const batch1Christianity = defineEvents("christianity", [
   {
     id: "asia-missions-1592",
     title: "동아시아 가톨릭과 임진왜란",
+    shortTitle: "일본 가톨릭의 박해 국면",
     startYear: 1592,
     kind: "event",
     significance: 3,

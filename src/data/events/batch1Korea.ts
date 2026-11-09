@@ -34,6 +34,7 @@ export const batch1Korea = defineEvents("korea", [
   {
     id: "tianjin-korea-1885",
     title: "톈진조약과 조선",
+    shortTitle: "청·일의 조선 출병 약정",
     startYear: 1885,
     kind: "event",
     significance: 4,

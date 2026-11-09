@@ -58,6 +58,7 @@ export const koreaEvents = defineEvents("korea", [
   {
     id: "lelang-313",
     title: "고구려, 낙랑군 축출",
+    shortTitle: "고구려의 낙랑군 축출",
     startYear: 313,
     kind: "event",
     significance: 4,
@@ -240,6 +241,7 @@ export const koreaEvents = defineEvents("korea", [
   {
     id: "samguk-yusa",
     title: "『삼국유사』",
+    shortTitle: "『삼국유사』 편찬",
     startYear: 1281,
     approximate: true,
     yearNote: "일연이 충렬왕대에 편찬. 정확한 완성 시점은 1280년대 안팎.",
@@ -624,6 +626,7 @@ export const koreaEvents = defineEvents("korea", [
   {
     id: "pyongyang-427",
     title: "장수왕, 평양 천도",
+    shortTitle: "장수왕의 평양 천도",
     startYear: 427,
     kind: "event",
     significance: 4,
@@ -650,6 +653,7 @@ export const koreaEvents = defineEvents("korea", [
   {
     id: "sabi-538",
     title: "백제, 사비 천도",
+    shortTitle: "백제의 사비 천도",
     startYear: 538,
     kind: "event",
     significance: 3,

@@ -10,6 +10,7 @@ import type {
 export type EventDraft = {
   id: string;
   title: string;
+  shortTitle?: string;
   startYear: number;
   endYear?: number;
   approximate?: boolean;

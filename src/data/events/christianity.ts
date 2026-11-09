@@ -281,6 +281,7 @@ export const christianityEvents = defineEvents("christianity", [
   {
     id: "constantinople-1204",
     title: "제4차 십자군, 콘스탄티노플 함락",
+    shortTitle: "제4차 십자군의 콘스탄티노플 함락",
     startYear: 1204,
     kind: "war",
     significance: 4,
@@ -537,6 +538,7 @@ export const christianityEvents = defineEvents("christianity", [
   {
     id: "korea-mission-1885",
     title: "언더우드·아펜젤러, 제물포 도착",
+    shortTitle: "언더우드·아펜젤러의 제물포 도착",
     startYear: 1885,
     kind: "event",
     significance: 5,

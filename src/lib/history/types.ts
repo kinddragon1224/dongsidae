@@ -23,6 +23,8 @@ export type Source = {
 export type HistoryEvent = {
   id: string;
   title: string;
+  /** 요약 문장·슬라이스 띠에 쓰는 짧은 명사구. "X의 Y" 꼴, 쉼표 없이. */
+  shortTitle?: string;
   startYear: number;
   endYear?: number;
   approximate?: boolean;
