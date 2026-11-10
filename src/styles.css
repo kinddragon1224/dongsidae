@@ -63,7 +63,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     line-height: 1.55;
-    overflow-x: hidden;
+    /* hidden이면 body가 스크롤 컨테이너가 되어 position: sticky가 안 붙는다 */
+    overflow-x: clip;
   }
 
   h1,
@@ -399,6 +400,16 @@
     var(--shadow-border),
     0 18px 36px -14px rgb(0 0 0 / 0.85),
     0 0 28px -10px color-mix(in oklab, var(--color-now) 45%, transparent);
+}
+
+/* 홈 연표의 칸 */
+.chronicle-cell {
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.chronicle-cell:hover,
+.chronicle-cell:focus-visible {
+  background: color-mix(in oklab, var(--color-primary) 9%, transparent);
 }
 
 /* 시간의 원통 — 원근 기준점은 '지금' 줄 */

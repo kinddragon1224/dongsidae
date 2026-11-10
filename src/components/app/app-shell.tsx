@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { IntroScreen } from "@/components/app/intro-screen";
+import { IntroScreen, LAST_YEAR_KEY } from "@/components/app/intro-screen";
 import { AppHeader } from "@/components/app/app-header";
 import { ExplainPanel } from "@/components/explain/explain-panel";
 import { SearchCommand } from "@/components/search/search-command";
@@ -71,6 +71,16 @@ function useDocumentTitle() {
   const entered = useTimeline((s) => s.entered);
   const selectedId = useTimeline((s) => s.selectedId);
   const event = selectedId ? getEventById(selectedId) : undefined;
+
+  // 홈의 '이어서 보기'가 읽는다
+  useEffect(() => {
+    if (!entered) return;
+    try {
+      window.localStorage.setItem(LAST_YEAR_KEY, String(year));
+    } catch {
+      // 저장소를 못 쓰면 이어서 보기 없이 동작
+    }
+  }, [entered, year]);
 
   useEffect(() => {
     if (event) {
