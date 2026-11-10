@@ -20,6 +20,17 @@ import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 const ORDER: Region[] = ["christianity", "korea", "east_asia", "world"];
 const NOW = 0.42;
 
+/**
+ * 시간의 원통: '지금' 줄에서 멀어질수록 뒤로 기울며 물러난다.
+ * 부모에 perspective(.time-drum)가 있어야 한다.
+ */
+function drumTransform(y: number, nowY: number, height: number): string {
+  const t = Math.max(-1, Math.min(1, (y - nowY) / Math.max(height * 0.4, 1)));
+  const tilt = -t * 52; // deg — 위(과거)는 윗변이, 아래(미래)는 아랫변이 멀어진다
+  const depth = -Math.abs(t) * 220; // px
+  return `translateY(-50%) translateZ(${depth.toFixed(1)}px) rotateX(${tilt.toFixed(1)}deg)`;
+}
+
 export function TimelineView() {
   const year = useTimeline((s) => s.year);
   const shift = useTimeline((s) => s.shift);
@@ -113,7 +124,7 @@ export function TimelineView() {
     >
       <div
         aria-hidden
-        className="now-band pointer-events-none absolute right-0 left-20 z-20"
+        className="now-band pointer-events-none absolute right-0 left-20"
         style={{ top: `${NOW * 100}%` }}
       >
         <div className="now-bloom" />
@@ -125,7 +136,7 @@ export function TimelineView() {
         className="absolute top-0 bottom-0 left-0 z-30 flex w-20 flex-col border-r border-border bg-background/80"
         aria-hidden
       >
-        <div className="relative h-full">
+        <div className="time-drum relative h-full">
           {ticks.map((tick) => {
             const y = nowY + (civilYearToOrdinal(tick) - yearOrd) * pxPerYear;
             if (y < 8 || y > height - 8) return null;
@@ -136,8 +147,12 @@ export function TimelineView() {
                 className="absolute right-0 flex items-center gap-1"
                 style={{
                   top: y,
-                  transform: "translateY(-50%)",
-                  transition: reduced ? "none" : "top 250ms var(--ease-out)",
+                  transform: drumTransform(y, nowY, height),
+                  transformOrigin: "100% 50%",
+                  opacity: 1 - Math.min(1, Math.abs(y - nowY) / (height * 0.5)) * 0.5,
+                  transition: reduced
+                    ? "none"
+                    : "top 250ms var(--ease-out), transform 250ms var(--ease-out)",
                 }}
               >
                 <span
@@ -194,6 +209,7 @@ export function TimelineView() {
           />
         ))}
       </div>
+      <div aria-hidden className="time-drum-shade absolute inset-y-0 right-0 left-20" />
     </div>
   );
 }
@@ -256,7 +272,7 @@ function RegionColumn({
   }, [view.events, nowY, yearOrd, pxPerYear, height, year]);
 
   return (
-    <section className="relative border-r border-border last:border-r-0">
+    <section className="time-drum relative border-r border-border last:border-r-0">
       <header className="absolute top-0 right-0 left-0 z-10 bg-gradient-to-b from-background via-background/90 to-transparent px-3 pt-3 pb-8">
         <div className="flex items-center gap-2">
           <span
@@ -288,8 +304,8 @@ function RegionColumn({
           1,
           Math.abs(item.y - nowY) / Math.max(height * 0.42, 1),
         );
-        const opacity = 1 - dist * 0.2;
-        const scale = reduced ? 1 : 1 - dist * 0.03;
+        const opacity = 1 - dist * 0.35;
+        const scale = 1; // 원근은 drumTransform이 담당
         return (
           <div
             key={item.event.id}
@@ -298,8 +314,10 @@ function RegionColumn({
               top: item.y,
               left: item.lane === 0 ? "0.5rem" : "48%",
               right: item.lane === 0 ? "48%" : "0.5rem",
-              transform: "translateY(-50%)",
-              transition: reduced ? "none" : "top 250ms var(--ease-out)",
+              transform: drumTransform(item.y, nowY, height),
+              transition: reduced
+                ? "none"
+                : "top 250ms var(--ease-out), transform 250ms var(--ease-out)",
             }}
           >
             {Math.abs(item.y - item.naturalY) > 3 && (
@@ -434,7 +452,7 @@ function NowChip({
         "bg-background/90 shadow-[var(--shadow-border)]",
         active ? "border-primary/45" : "border-primary/25",
       )}
-      style={{ top: nowY, transform: "translateY(-50%)" }}
+      style={{ top: nowY, transform: "translateY(-50%) translateZ(14px)" }}
     >
       {visual ? (
         <span aria-hidden className="now-chip-visual">
