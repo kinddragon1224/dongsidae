@@ -20,11 +20,15 @@ export type Source = {
   year?: number;
 };
 
+export type Place = { name: string; lat: number; lng: number };
+
 export type HistoryEvent = {
   id: string;
   title: string;
   /** 요약 문장·슬라이스 띠에 쓰는 짧은 명사구. "X의 Y" 꼴, 쉼표 없이. */
   shortTitle?: string;
+  /** 지구본에 찍는 대표 위치. 시대·왕조는 당시 수도. 한 점으로 말할 수 없으면 비운다. */
+  place?: Place;
   startYear: number;
   endYear?: number;
   approximate?: boolean;

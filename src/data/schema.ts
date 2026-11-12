@@ -11,6 +11,7 @@ export type EventDraft = {
   id: string;
   title: string;
   shortTitle?: string;
+  place?: HistoryEvent["place"];
   startYear: number;
   endYear?: number;
   approximate?: boolean;

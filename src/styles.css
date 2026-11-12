@@ -402,6 +402,19 @@
     0 0 28px -10px color-mix(in oklab, var(--color-now) 45%, transparent);
 }
 
+/* 지구본 위 장소 이름 */
+.globe-label {
+  background: rgb(12 11 9 / 0.72);
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out);
+}
+
+.globe-label:hover,
+.globe-label:focus-visible {
+  background: color-mix(in oklab, var(--color-primary) 22%, rgb(12 11 9));
+}
+
 /* 홈 연표의 칸 */
 .chronicle-cell {
   transition: background-color var(--motion-fast) var(--ease-out);

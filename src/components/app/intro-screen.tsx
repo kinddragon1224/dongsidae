@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
+import { Globe, type GlobeMark } from "@/components/visual/globe";
 import { DEFAULT_YEAR, ERA_SHORTCUTS } from "@/lib/history/constants";
+import { getEventById } from "@/lib/history/query";
 import { REGION_META } from "@/lib/history/regions";
 import { buildTimeSlice } from "@/lib/history/slice";
 import { useTimeline } from "@/lib/history/store";
 import { REGIONS } from "@/lib/history/types";
-import { formatYear } from "@/lib/history/years";
+import { formatYear, formatYearBare } from "@/lib/history/years";
 import { useYearReveal } from "@/lib/visuals/transition-store";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +37,42 @@ export function IntroScreen() {
     }
   }, []);
 
-  const resumeYear = lastYear ?? DEFAULT_YEAR;
+  // 지구본과 문장이 보여주는 해. 고르기 전에는 마지막으로 본 해.
+  const [picked, setPicked] = useState<number | null>(null);
+  const resumeYear = picked ?? lastYear ?? DEFAULT_YEAR;
   const resume = useMemo(() => buildTimeSlice(resumeYear), [resumeYear]);
+  const places = useMemo(
+    () =>
+      resume.regions.map((row) => ({
+        row,
+        place: row.eventId ? getEventById(row.eventId)?.place : undefined,
+      })),
+    [resume],
+  );
+  const marks = useMemo<GlobeMark[]>(
+    () =>
+      places.flatMap(({ row, place }) =>
+        place && row.eventId
+          ? [
+              {
+                id: row.eventId,
+                name: place.name,
+                lat: place.lat,
+                lng: place.lng,
+                color: REGION_META[row.region].token,
+                label: `${REGION_META[row.region].label} ${row.title}, ${place.name}`,
+              },
+            ]
+          : [],
+      ),
+    [places],
+  );
+  const heroLabel =
+    picked == null
+      ? lastYear
+        ? "이어서 보기"
+        : "여기서 시작"
+      : (ERA_SHORTCUTS.find((era) => era.year === picked)?.hint ?? "이 해의 세계");
   const rows = useMemo(
     () => ERA_SHORTCUTS.map((era) => ({ era, slice: buildTimeSlice(era.year) })),
     [],
@@ -87,29 +123,95 @@ export function IntroScreen() {
         </header>
 
         <section
-          aria-label={lastYear ? "이어서 보기" : "여기서 시작"}
-          className="mt-2 rounded-xl border border-border bg-card/70 p-5 md:mt-6 md:p-8"
+          aria-label="이 해의 세계"
+          className="mt-2 rounded-xl border border-border bg-card/70 md:mt-6"
         >
-          <p className="text-xs tracking-[0.22em] text-subtle">
-            {lastYear ? "이어서 보기" : "여기서 시작"}
-          </p>
-          <div className="mt-3 flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-10">
+          {/* 해 고르기 — 지구본과 문장이 따라 바뀐다 */}
+          <div
+            role="group"
+            aria-label="해 고르기"
+            className="flex gap-1.5 overflow-x-auto border-b border-border px-3 py-2.5 [scrollbar-width:none] md:flex-wrap md:px-5"
+          >
+            {ERA_SHORTCUTS.map((era) => {
+              const active = era.year === resumeYear;
+              return (
+                <button
+                  key={era.id}
+                  type="button"
+                  aria-pressed={active}
+                  title={era.hint}
+                  onClick={() => setPicked(era.year)}
+                  className={cn(
+                    "shrink-0 rounded-full px-3 py-1.5 text-xs whitespace-nowrap",
+                    active
+                      ? "bg-primary font-medium text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <span className="font-serif tabular-nums">{formatYearBare(era.year)}</span>
+                  <span className="ml-1.5">{era.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid gap-2 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:items-center md:gap-8 md:p-8">
             <div className="min-w-0">
-              <p className="font-serif text-5xl font-medium tracking-tight text-primary tabular-nums md:text-6xl">
+              <p className="text-xs tracking-[0.22em] text-subtle">{heroLabel}</p>
+              <p className="mt-3 font-serif text-5xl font-medium tracking-tight text-primary tabular-nums md:text-6xl">
                 {formatYear(resumeYear)}
               </p>
-              <p className="mt-3 max-w-3xl font-serif text-base leading-relaxed text-foreground md:text-lg">
+              <p className="mt-3 font-serif text-base leading-relaxed text-foreground md:text-lg">
                 {resume.sentence}
               </p>
+
+              {/* 어디에서 — 지구본의 점과 같은 정보를 글로 */}
+              <ul className="mt-5 divide-y divide-border border-y border-border">
+                {places.map(({ row, place }) => {
+                  const meta = REGION_META[row.region];
+                  return (
+                    <li key={row.region}>
+                      <button
+                        type="button"
+                        onClick={() => openYear(resumeYear, row.eventId)}
+                        className="chronicle-cell flex w-full items-baseline gap-3 px-1 py-2.5 text-left"
+                      >
+                        <span className="flex w-16 shrink-0 items-center gap-1.5">
+                          <span
+                            className="size-1.5 rounded-full"
+                            style={{ background: meta.token }}
+                          />
+                          <span className="text-xs text-muted-foreground">{meta.label}</span>
+                        </span>
+                        <span className="min-w-0 flex-1 truncate font-serif text-sm text-foreground">
+                          {row.title}
+                        </span>
+                        {place ? (
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {place.name}
+                          </span>
+                        ) : null}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <button
+                type="button"
+                onClick={() => openYear(resumeYear)}
+                className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground active:scale-[0.96] sm:w-auto"
+              >
+                {formatYear(resumeYear)} 시간축 열기
+                <ArrowRight className="size-4" aria-hidden />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => openYear(resumeYear)}
-              className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground active:scale-[0.96]"
-            >
-              시간축 열기
-              <ArrowRight className="size-4" aria-hidden />
-            </button>
+
+            <Globe
+              marks={marks}
+              onOpen={(id) => openYear(resumeYear, id)}
+              className="order-first mx-auto aspect-square w-full max-w-[20rem] md:order-none md:max-w-none"
+            />
           </div>
         </section>
 

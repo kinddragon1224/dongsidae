@@ -36,6 +36,7 @@ export const batch1Korea = defineEvents("korea", [
     title: "톈진조약과 조선",
     shortTitle: "청·일의 조선 출병 약정",
     startYear: 1885,
+    place: { name: "한성", lat: 37.57, lng: 126.98 },
     kind: "event",
     significance: 4,
     categories: ["개항", "조선"],
